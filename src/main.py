@@ -134,7 +134,7 @@ def main(args: argparse.Namespace) -> None:
         mb = ModelBuilder(data[0],
                           data[1],
                           args.verbose)
-        
+
         # stacking classifier
         sclf = mb.build_stacking_ensemble(list(clfs.values()),
                                           list(clfs.keys()))
