@@ -173,6 +173,25 @@ ipython_config.py
 # Remove previous ipynb_checkpoints
 #   git rm -r .ipynb_checkpoints/
 
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.vscode/
+
+# Local History for Visual Studio Code
+.history/
+
+# Built Visual Studio Code Extensions
+*.vsix
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+.ionide
 
 ## additional stuff that is too large or should not be on github
 data/
