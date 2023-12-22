@@ -1,2 +1,2 @@
-# dont_overfit_ii
-Repository for my work on the kaggle competition 'don't_overfit_ii'
+# ieee_fraud_detection
+Repository for my work on the kaggle 'ieee_fraud_detection'
