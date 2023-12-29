@@ -40,6 +40,7 @@ class DataPreperator:
         # strip down the data
         self.remove_non_numerical_columns()
         self.remove_empty_columns()
+        self.replace_empty_values()
 
         # write the data into a new csv file
         if write:
@@ -128,8 +129,10 @@ Dropping...')
                 elif strategy == STRATEGY_RANDOM:
                     # TODO: implement
                     raise NotImplementedError
+                logging.debug(f'filling column {col} with {strategy} and value\
+ {filler} for {self.data[col].isna().sum()} entries')
                 # fill the missing values
-                self.data[col].fillna(filler)
+                self.data[col] = self.data[col].fillna(filler)
 
     def __write_to_csv(self) -> None:
         # TODO: collect the correct name for the filepath
