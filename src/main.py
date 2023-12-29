@@ -1,6 +1,7 @@
 import argparse
 import logging
 import sys
+import pandas as pd
 
 from dataengineering.data_preprocessing import DataPreprocessor
 from models.evaluator import Evaluator
@@ -79,15 +80,20 @@ def main(args: argparse.Namespace) -> None:
     preprocessor = DataPreprocessor(args.verbose)
     # TODO: better feature selection method, select good features but only
     # later after we tested all models and found the one we want to work with
-    features = [str(i) for i in range(300)]
 
-    data = preprocessor.preprocess_data(args.traindata, features, 'target')
+    df = pd.read_csv(args.traindata)
+    features = df.columns.values.tolist()
+    features = [str(feature) for feature in features]
+
+    logging.info('Preprocessing Data...')
+    data = preprocessor.preprocess_data(args.traindata, features, 'isFraud')
 
     # predict on the given estimators
     evaluator = Evaluator(data[0],
                           data[1],
                           args.verbose)
 
+    logging.info('evaluating base models...')
     # evaluate the scores on the list of all classifiers
     clf_scores = evaluator.evaluate_model(list(CLFS_SHORT_DICT.values()),
                                           list(CLFS_SHORT_DICT.keys()))

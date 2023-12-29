@@ -16,13 +16,17 @@ test:
 	python3 -m doctest *.py
 
 testset:
-	python3 -W"ignore" main.py --traindata ../data/train.csv
+	python3 -W"ignore" main.py --traindata ../data/train_data_prepared.csv \
+--verbose
 
 prediction:
-	python3 -W"ignore" main.py --predict --traindata ../data/train.csv --testdata ../data/test.csv -st ../data/sample_submission.csv -sd ../submission
+	python3 -W"ignore" main.py --predict --traindata \
+../data/train_data_prepared.csv --testdata ../data/test_data_prepared.csv -st ../data/sample_submission.csv -sd ../submission
 
 ensemble:
-	python3 -W"ignore" main.py --predict --ensemble --traindata ../data/train.csv --testdata ../data/test.csv -st ../data/sample_submission.csv -sd ../submission
+	python3 -W"ignore" main.py --predict --ensemble --traindata \
+../data/train_data_prepared.csv --testdata ../data/test_data_prepared.csv -st ../data/sample_submission.csv -sd ../submission
 
 debug:
-	python3 -W"ignore" main.py --ensemble --traindata ../data/train.csv --testdata ../data/test.csv -st ../data/sample_submission.csv -sd ../submission -n 5 --verbose --debug
+	python3 -W"ignore" main.py --ensemble --traindata \
+../data/train_data_prepared.csv --testdata ../data/test_data_prepared.csv -st ../data/sample_submission.csv -sd ../submission -n 5 --verbose --debug
