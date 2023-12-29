@@ -8,7 +8,7 @@ from models.evaluator import Evaluator
 from models.predictor import Predictor
 from models.model_builder import ModelBuilder
 
-from consts.model_consts import CLFS_SHORT_DICT
+from consts.model_consts import CLFS_SHORT_DICT, CLASSIFIERS_DICT
 
 
 def parse_args() -> argparse.Namespace:
@@ -75,7 +75,8 @@ def parse_args() -> argparse.Namespace:
 # TODO: wrap main method better
 def main(args: argparse.Namespace) -> None:
     logging.basicConfig(stream=sys.stdout,
-                        format="%(levelname) -10s %(asctime)s %(module)s:%(lineno)s %(funcName)s %(message)s",
+                        format="%(levelname) -10s %(asctime)s %(module)s:\
+%(lineno)s %(funcName)s %(message)s",
                         level=logging.DEBUG)
     preprocessor = DataPreprocessor(args.verbose)
     # TODO: better feature selection method, select good features but only
@@ -95,8 +96,8 @@ def main(args: argparse.Namespace) -> None:
 
     logging.info('evaluating base models...')
     # evaluate the scores on the list of all classifiers
-    clf_scores = evaluator.evaluate_model(list(CLFS_SHORT_DICT.values()),
-                                          list(CLFS_SHORT_DICT.keys()))
+    clf_scores = evaluator.evaluate_model(list(CLASSIFIERS_DICT.values()),
+                                          list(CLASSIFIERS_DICT.keys()))
 
     # Return the scores of the top five
     # parse the score into readable output
@@ -110,7 +111,7 @@ def main(args: argparse.Namespace) -> None:
         is_ensemble = False
         # format the identifier of the classifier as the identifier of
         # the clf + the average score it achieved
-        current_clf = CLFS_SHORT_DICT[score]
+        current_clf = CLASSIFIERS_DICT[score]
         current_clf_identifier = f'{score}-{round(top_n_clf_scores[score][0], 3)}'
         # make a prediction for the top 5 clfs
         if args.predict:
@@ -135,7 +136,7 @@ def main(args: argparse.Namespace) -> None:
         # get all clfs in a lst
         clfs = {}
         for score in top_n_clf_scores:
-            clfs[score] = CLFS_SHORT_DICT[score]
+            clfs[score] = CLASSIFIERS_DICT[score]
         logging.info(f'building ensemble of top {args.n} classifiers')
         mb = ModelBuilder(data[0],
                           data[1],

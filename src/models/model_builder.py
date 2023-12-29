@@ -97,11 +97,11 @@ class ModelBuilder:
         """
         builds a stacking model from a classifier where it uses k folds to
         make predictions and stacks these predictions into one final model.
-        
+
         Paramters:
             - 'clf' the classifier we want to use
             - 'clf_identifier' the identifier of the classifier we want to use
-        
+
         Return:
             - a tuple containing the the idetnifier of the new classifier and
                 the new clf itself
@@ -137,8 +137,8 @@ class ModelBuilder:
                 clf.fit(x_train_fold, y_train_fold)
 
                 # predict on the test fold
-                logging.debug(f'predicting on test fold {i} using {name} classifier')
-                y_split = clf.predict(x_test_fold)
+                logging.debug(f'predicting on test fold {i} using {name} classifier and predict_proba')
+                y_split = clf.predict_proba(x_test_fold)
                 # our predictions are in order of the indices of the test fold
                 # split. We can now change all of the indices that we predicted in
                 # our meta training set

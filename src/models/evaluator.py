@@ -4,9 +4,10 @@ import logging
 
 from statistics import mean
 import numpy as np
+from util.decorators import timeit
 
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import roc_auc_score
 
 
 class Evaluator():
@@ -29,6 +30,7 @@ class Evaluator():
         self.y = y
         self.verbose = verbose
 
+    @timeit
     def cross_validate_model(self,
                              clf: Any,
                              x: np.ndarray,
@@ -65,24 +67,42 @@ class Evaluator():
         skf.get_n_splits(x, y)
         scores = []
         if self.verbose:
-            logging.debug(f'evaluating model {clf} on {splits} splits using stratified k-cross validation')
+            logging.debug(f'evaluating model {clf} on {splits} splits using \
+stratified k-cross validation')
 
         # iterate over every split
-        for _, (train_idx, test_idx) in enumerate(skf.split(x, y)):
-            # extract the train and test fold
-            x_train_fold, x_test_fold = x[train_idx], x[test_idx]
-            y_train_fold, y_test_fold = y[train_idx], y[test_idx]
+        for i, (train_idx, test_idx) in enumerate(skf.split(x, y)):
+            logging.debug(f'running {i}th split for {clf}')
 
-            # make a prediction for the current split and store result, calc
-            # the performance of the clf on the current split afterwards
-            clf.fit(x_train_fold, y_train_fold)
-            y_test_fold_predict = clf.predict(x_test_fold)
-            score = accuracy_score(y_test_fold, y_test_fold_predict)
-            scores.append(score)
+            # handle with try except to prevent entire testing process to fail
+            # because of one classifier
+            try:
+                # extract the train and test fold
+                x_train_fold, x_test_fold = x[train_idx], x[test_idx]
+                y_train_fold, y_test_fold = y[train_idx], y[test_idx]
+
+                # make a prediction for the current split and store result,
+                # calc the performance of the clf on the current split
+                # afterwards
+                clf.fit(x_train_fold, y_train_fold)
+
+                # handle classifiers that are not able to predict probabilities
+                y_test_fold_predict = clf.predict_proba(x_test_fold)
+                # use the probabilities for label 1 for roc curve as we use TP
+                # and FP for the curve
+                score = roc_auc_score(y_test_fold, y_test_fold_predict[:, 1])
+                scores.append(score)
+            except Exception as e:
+                logging.debug(f'got an error for {clf} breaking...: {e}')
+                scores.append(0.0)
+                break
+
         return scores
 
+    @timeit
     def evaluate_model(self,
                        clfs: list[Any],
+
                        clf_names: list[str]
                        ) -> dict[str, tuple[float, list[float]]] | None:
         """
@@ -106,8 +126,8 @@ class Evaluator():
         # lets throw an error if we dont have equal ammount of names and clfs
         # as we would be unable to map them correctly
         if len(clfs) != len(clf_names):
-            logging.error(f'Received {len(clfs)} classifiers and {len(clf_names)}. \
-                  Unable to create valid mapping for this case. Quiting...')
+            logging.error(f'Received {len(clfs)} classifiers and \
+{len(clf_names)}. Unable to create valid mapping for this case. Quiting...')
             return None
 
         if self.verbose:
@@ -116,8 +136,8 @@ class Evaluator():
         # first check if we actually have y data to evaluate on to prevent
         # trying to predict without data
         if self.y is None:
-            logging.error('got no target data, can#t evaluate model score on target \
-                  data')
+            logging.error('got no target data, can#t evaluate model score on \
+target data')
             return None
 
         scores = {}
@@ -130,9 +150,12 @@ class Evaluator():
                                                    self.y)
             # print the scores if verbose
             if self.verbose:
-                logging.debug(f'Max score for {classifier_name} classifier was: {max(clf_scores)*100}%')
-                logging.debug(f'Min score for {classifier_name} classifier was: {min(clf_scores)*100}')
-                logging.debug(f'Mean overall score for {classifier_name} classifier was: {mean(clf_scores)*100}%')
+                logging.debug(f'Mean overall score for {classifier_name} \
+classifier was: {mean(clf_scores)*100} %')
+                logging.debug(f'Max score for {classifier_name} classifier \
+was: {max(clf_scores)*100} %')
+                logging.debug(f'Min score for {classifier_name} classifier \
+was: {min(clf_scores)*100} %')
 
             # add the classifier scores to the dict as well as the avg score
             mean_score = mean(clf_scores)
