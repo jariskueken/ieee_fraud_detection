@@ -99,7 +99,7 @@ CLASSIFIERS_DICT = {
         max_depth=5, n_estimators=10, max_features=1, random_state=42
     ),
     "AdaBoost": AdaBoostClassifier(random_state=42),
-    "GradBoost": GradientBoostingClassifier(random_state=42),
+    # "GradBoost": GradientBoostingClassifier(random_state=42),
     "GNB": GaussianNB(),
     "BNB": BernoulliNB(),
     "LDA": LinearDiscriminantAnalysis(),

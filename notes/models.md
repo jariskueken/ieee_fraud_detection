@@ -28,4 +28,4 @@
     | Quadratic Discriminant Analysis | 99.982 % | 100.0 % | 99.956 % | / |
     | Neural Network | 100.0 % | 99.999.. % | 99.999.. % | / |
 
-- most models **overfit**
+- most models **overfit**, should be result of the imbalanced dataset we have

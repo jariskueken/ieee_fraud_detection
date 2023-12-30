@@ -82,12 +82,8 @@ def main(args: argparse.Namespace) -> None:
     # TODO: better feature selection method, select good features but only
     # later after we tested all models and found the one we want to work with
 
-    df = pd.read_csv(args.traindata)
-    features = df.columns.values.tolist()
-    features = [str(feature) for feature in features]
-
     logging.info('Preprocessing Data...')
-    data = preprocessor.preprocess_data(args.traindata, features, 'isFraud')
+    data = preprocessor.preprocess_data(args.traindata, 'isFraud')
 
     # predict on the given estimators
     evaluator = Evaluator(data[0],
@@ -115,7 +111,7 @@ def main(args: argparse.Namespace) -> None:
         current_clf_identifier = f'{score}-{round(top_n_clf_scores[score][0], 3)}'
         # make a prediction for the top 5 clfs
         if args.predict:
-            test_data = preprocessor.preprocess_data(args.testdata, features)
+            test_data = preprocessor.preprocess_data(args.testdata)
             predictor = Predictor(data[0], data[1], test_data[0], args.verbose)
 
             logging.info(f"predicting on {current_clf_identifier}")
@@ -127,7 +123,7 @@ def main(args: argparse.Namespace) -> None:
                 True,
                 args.submissiontemplate,
                 args.submissiontarget,
-                'target',
+                'isFraud',
                 is_ensemble
             )
 
@@ -173,7 +169,7 @@ def main(args: argparse.Namespace) -> None:
                 {round(scores[score][0], 3) * 100}%')
 
         if args.predict:
-            test_data = preprocessor.preprocess_data(args.testdata, features)
+            test_data = preprocessor.preprocess_data(args.testdata)
             predictor = Predictor(data[0], data[1], test_data[0], args.verbose)
 
             for eclf, eclf_identifier in zip(ensembles, ensembles_identifiers):
@@ -186,7 +182,7 @@ def main(args: argparse.Namespace) -> None:
                     True,
                     args.submissiontemplate,
                     args.submissiontarget,
-                    'target',
+                    'isFraud',
                     False,
                 )
 

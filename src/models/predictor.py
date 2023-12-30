@@ -189,7 +189,7 @@ class Predictor:
         # make a prediction, the predictions in the prediciton array should be
         # ordered in the same way as the order of the test samples in
         # self.test_data_X
-        prediction = clf_trained.predict(self.test_data_X)
+        prediction = clf_trained.predict_proba(self.test_data_X)
 
         submission_file = ""
         if store_prediction:
@@ -219,4 +219,3 @@ class Predictor:
             - 'clf_path' the path to the stored classifier
         """
 
-        

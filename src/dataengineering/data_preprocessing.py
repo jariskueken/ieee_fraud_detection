@@ -17,8 +17,10 @@ class DataPreprocessor():
     """
     def __init__(self, verbose: bool):
         self.verbose = verbose
+        self.data = pd.DataFrame()
+        self.features: list[str] = []
 
-    def _read_data(self, f: str) -> pd.DataFrame:
+    def __read_data(self, f: str) -> None:
         """
         A private method to read the data from the csv file
         """
@@ -27,7 +29,8 @@ class DataPreprocessor():
             logging.error('check if file exists and is of type csv file...')
         # first check if the filepath points to a valid file
         if file_path_exists_error is not None:
-            logging.error(f'received invalid file path: {file_path_exists_error}')
+            logging.error(f'received invalid file path: \
+{file_path_exists_error}')
         # now check if the file is a csv file
         file_is_csv_error = file_util.check_file_is_csv(f)
         if file_is_csv_error is not None:
@@ -35,12 +38,34 @@ class DataPreprocessor():
         # now that we checked everything we can read the data
         if self.verbose:
             logging.error('check completed, reading data file now...')
-        return pd.read_csv(f)
+
+        self.data = pd.read_csv(f)
+
+    def __get_features(self,
+                       target: str = '') -> None:
+        """
+        A private method that gets a target feature and selects all features
+        from the provided dataset from there on. Writes the features list into
+        'self.features'.
+        """
+
+        features = self.data.columns.values.tolist()
+        # store the features as str names
+        features = [str(feature) for feature in features]
+
+        # drop the target from the list of features as we don't want to train
+        # with the target
+        if target != '':
+            if target in features:
+                logging.debug(f'found target {target} in list of features. \
+Deleting...')
+                features.remove(target)
+
+        self.features = features
 
     def preprocess_data(self,
                         f: str,
-                        features: list[Any],
-                        target: Any = None
+                        target: str = ''
                         ) -> tuple[np.ndarray, np.ndarray] | tuple[np.ndarray, None]:
         """
         Preprocesses data with every necessary steps
@@ -63,21 +88,23 @@ class DataPreprocessor():
         3. Return the standard scaled data with only the selected features
         4. Return the data as Dataframe again
         """
-        data = self._read_data(f)
+
+        self.__read_data(f)
+        self.__get_features(target)
+
         scaler = StandardScaler()
 
         # select only the provided features and also the targets
-        features = data[features]
-
         targets = None
         # only select targets if parameter is provided
-        if target is not None:
-            targets = data[target].to_numpy()
+        if target != '':
+            targets = self.data[target].to_numpy()
             if self.verbose:
                 logging.debug(f'targt vector is of shape {targets.shape}')
 
-        scaled_features = scaler.fit_transform(features)
+        scaled_features = scaler.fit_transform(self.data[self.features])
         if self.verbose:
-            logging.debug(f'scaled feature vector is of shape: {scaled_features.shape}.')
+            logging.debug(f'scaled feature vector is of shape: \
+{scaled_features.shape}.')
 
         return tuple([scaled_features, targets])  # type: ignore

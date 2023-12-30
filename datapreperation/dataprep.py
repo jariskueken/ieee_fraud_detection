@@ -4,6 +4,8 @@ import os
 import sys
 import argparse
 
+from sklearn.preprocessing import LabelEncoder
+
 STRATEGY_MEAN = 'mean'
 STRATEGY_MEDIAN = 'medain'
 STRATEGY_RANDOM = 'random'
@@ -38,7 +40,8 @@ class DataPreperator:
 
         # TODO: fix so that we dont automatically run all steps on creation
         # strip down the data
-        self.remove_non_numerical_columns()
+        # self.remove_non_numerical_columns()
+        self.encode_cateogircal_features()
         self.remove_empty_columns()
         self.replace_empty_values()
 
@@ -66,7 +69,8 @@ class DataPreperator:
         self.data = self.dataframes[0]
         for df in self.dataframes[1:]:
             if self.match in df.columns:
-                self.data = self.data.merge(df, on=self.match)
+                # use outer as merge type to preserv columns from both dfs
+                self.data = self.data.merge(df, on=self.match, how='outer')
             else:
                 raise ValueError(f'Could not find the match column\
 {self.match}')
@@ -101,6 +105,17 @@ Dropping...')
                 logging.debug(f'column {col} is of type {self.data[col].dtype}\
 , dropping...')
                 del self.data[col]
+
+    def encode_cateogircal_features(self) -> None:
+        """
+        encodes every categroical feature in the dataset using the sklearn
+        label encoder
+        """
+        le = LabelEncoder()
+        for col in self.data:
+            if self.data[col].dtype == 'object':
+                encoded_col = le.fit_transform(self.data[col])
+                self.data[col] = encoded_col
 
     def replace_empty_values(self,
                              strategy: str = STRATEGY_MEAN) -> None:
