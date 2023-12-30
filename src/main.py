@@ -1,4 +1,5 @@
 import argparse
+import coloredlogs
 import logging
 import sys
 import pandas as pd
@@ -78,6 +79,7 @@ def main(args: argparse.Namespace) -> None:
                         format="%(levelname) -10s %(asctime)s %(module)s:\
 %(lineno)s %(funcName)s %(message)s",
                         level=logging.DEBUG)
+    coloredlogs.install(level='DEBUG')
     preprocessor = DataPreprocessor(args.verbose)
     # TODO: better feature selection method, select good features but only
     # later after we tested all models and found the one we want to work with
