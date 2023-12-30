@@ -6,6 +6,7 @@ bleach==6.1.0
 blinker==1.4
 certifi==2023.7.22
 charset-normalizer==3.3.2
+coloredlogs==15.0.1
 comm==0.2.0
 command-not-found==0.3
 contourpy==1.2.0
@@ -23,6 +24,7 @@ fonttools==4.44.1
 gower==0.1.2
 htmlmin==0.1.12
 httplib2==0.20.2
+humanfriendly==10.0
 idna==3.4
 igraph==0.11.3
 ImageHash==4.3.1
