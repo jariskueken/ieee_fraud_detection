@@ -8,6 +8,8 @@ from util import file_util
 import numpy as np
 import pandas as pd
 
+from models.model_builder import ModelBuilder
+
 
 class Predictor:
     """
@@ -18,6 +20,8 @@ class Predictor:
                  train_data_X: np.ndarray,
                  train_data_y: np.ndarray,
                  test_data_X: np.ndarray,
+                 dataset_identifier: str,
+                 model_builder: ModelBuilder,
                  verbose: bool
                  ):
         """
@@ -32,6 +36,8 @@ class Predictor:
         self.train_data_X = train_data_X
         self.train_data_y = train_data_y
         self.test_data_X = test_data_X
+        self.dataset_identifier = dataset_identifier
+        self.model_builder = model_builder
 
     def _store_prediction(self,
                           prediction: np.ndarray,
@@ -89,8 +95,9 @@ class Predictor:
 
         if self.verbose:
             logging.debug('Creating submission file...')
-        # overwrite the target collumn
-        submission[target] = prediction
+        # overwrite the target collumn, just pass the proba for target = 1 to
+        # match roc_auc format
+        submission[target] = [prediction[i][1] for i in range(len(prediction))]
 
         # Create the submissions for each day folder if it doesn't exist
         date = datetime.now().strftime("%Y-%m-%d")
@@ -112,8 +119,7 @@ class Predictor:
 
     def train(self,
               clf: Any,
-              clf_identifier: str,
-              store: bool
+              clf_identifier: str
               ) -> Any:
         """
         A method to train a given model on the train dataset that was provided
@@ -132,13 +138,14 @@ class Predictor:
 
         # fit the model on the training data
         if self.verbose:
-            logging.debug(f'Fitting training data on {clf_identifier} classifier...')
+            logging.debug(f'Fitting training data on {clf_identifier} \
+classifier...')
 
-        clf = clf.fit(self.train_data_X, self.train_data_y)
+        clf.fit(self.train_data_X, self.train_data_y)
 
-        if store:
-            # TODO: handle model storing if we want to store the model
-            pass
+        self.model_builder.export_model(clf,
+                                        clf_identifier,
+                                        self.dataset_identifier)
         return clf
 
     def predict(self,
@@ -149,7 +156,7 @@ class Predictor:
                 submission_template_path: str = None,
                 submission_dir: str = None,
                 target: str = None,
-                ensemble: bool = False,
+                pretrained: bool = False,
                 ) -> tuple[np.ndarray, str]:
         """
         A method to make a prediciton on a given dataset. The Predictor class
@@ -172,6 +179,9 @@ class Predictor:
             - 'target' the name of the column in the submission file where the
                 prediciton should be written to. #TODO: maybe it is better to
                 default this to 'target'
+            - 'pretrained' defines if we use a stored model that was already
+                pretrained so we don't need to train it again. Applys also if
+                we use an ensemble as this model is also pretrained.
 
         Return:
             - the ndarray containing the predictions if we just want to get
@@ -182,23 +192,33 @@ class Predictor:
 
         # only train the model if we dont have an ensemble
         clf_trained = clf
-        if not ensemble:
+        if not pretrained:
             # overwrite the trained clf if we train it again
-            clf_trained = self.train(clf, clf_identifier, store_model)
+            clf_trained = self.train(clf,
+                                     clf_identifier)
 
         # make a prediction, the predictions in the prediciton array should be
         # ordered in the same way as the order of the test samples in
         # self.test_data_X
-        prediction = clf_trained.predict_proba(self.test_data_X)
-
+        try:
+            prediction = clf_trained.predict_proba(self.test_data_X)
+        except Exception as e:
+            # if we get an exception just return an array of zeros that has
+            # the same size as the target array
+            logging.error(f' got an exception trying to predict with \
+{clf_identifier}: {e}')
+            # build a 2d array to match the dimensionalty of a predict proba
+            # array
+            prediction = np.zeros((self.train_data_y.shape[0], 2))
         submission_file = ""
         if store_prediction:
-            # store the prediciton
+            # store the prediction
             submission_file = self._store_prediction(prediction,
                                                      clf_identifier,
                                                      submission_template_path,
                                                      submission_dir,
                                                      target)
+        logging.info(f'finished predicting on {clf_identifier}')
 
         return tuple([prediction, submission_file])
 
@@ -218,4 +238,5 @@ class Predictor:
         Paramters:
             - 'clf_path' the path to the stored classifier
         """
+
 

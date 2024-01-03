@@ -22,7 +22,7 @@ testset:
 prediction:
 	python3 -W"ignore" main.py --predict --traindata \
 ../data/train_data_prepared.csv --testdata ../data/test_data_prepared.csv -st \
-../data/sample_submission.csv -sd ../submission -n 11
+../data/sample_submission.csv -sd ../submission --verbose -md ../models
 
 ensemble:
 	python3 -W"ignore" main.py --predict --ensemble --traindata \

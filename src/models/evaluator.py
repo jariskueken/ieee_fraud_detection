@@ -104,7 +104,7 @@ stratified k-cross validation')
                        clfs: list[Any],
 
                        clf_names: list[str]
-                       ) -> dict[str, tuple[float, list[float]]] | None:
+                       ) -> dict[str, tuple[float, list[float]]]:
         """
         Evaluates the model given as paramters using stratified
         k-cross-validation. Can predict one or multiple models sequentually
@@ -128,7 +128,7 @@ stratified k-cross validation')
         if len(clfs) != len(clf_names):
             logging.error(f'Received {len(clfs)} classifiers and \
 {len(clf_names)}. Unable to create valid mapping for this case. Quiting...')
-            return None
+            return {}
 
         if self.verbose:
             logging.debug(f'Evaluating {len(clfs)} classifiers...')
@@ -138,7 +138,7 @@ stratified k-cross validation')
         if self.y is None:
             logging.error('got no target data, can#t evaluate model score on \
 target data')
-            return None
+            return {}
 
         scores = {}
         for i, clf in enumerate(clfs):

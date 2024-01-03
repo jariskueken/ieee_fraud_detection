@@ -20,52 +20,86 @@ class ModelBuilder:
     def __init__(self,
                  train_data_X: np.ndarray,
                  train_data_y: np.ndarray,
-                 verbose: bool):
+                 model_dir: str,
+                 verbose: bool) -> None:
         self.verbose = verbose
 
         self.train_data_X = train_data_X
         self.train_data_y = train_data_y
 
+        self.model_dir = model_dir
+
+        # lets check if the model directory exists
+        self.__check_model_dir()
+
+    def __check_model_dir(self) -> None:
+        """
+        A private method to check if the model directory exists.
+        """
+        # check if the directory exists, if not create
+        if not os.path.exists(self.model_dir):
+            if self.verbose:
+                logging.debug("model directory does not exists, creating now")
+            os.makedirs(self.model_dir)
+
+    def get_classifier(self,
+                       clf: Any,
+                       clf_identifier: str,
+                       dataset_identifier: str,
+                       ) -> tuple[Any, bool]:
+        """
+        A method to get a specific model. Checks if the required model already
+        exists if so the model is imported. If not the basic model is just
+        returned.
+        """
+        pretrained = False
+
+        # check if the model exists at the given identifiers.
+        filepath = f'{clf_identifier}_@{dataset_identifier}.pkl'
+
+        path = os.path.join(self.model_dir, filepath)
+        if os.path.exists(path):
+            logging.debug(f'Found a pretrained classifier at {path}')
+            pretrained = True
+            clf = self.import_model(path)
+        return (clf, pretrained)
+
     def export_model(self,
                      clf: Any,
                      clf_identifier: str,
-                     dir: str
-                     ) -> str:
+                     dataset_identifier: str,
+                     ) -> None:
         """
         A method to export a given model. The model should be trained
-        beforehand and will be exported using the pickle module.
+        beforehand and will be exported using the pickle module. Stores the
+        models to the directory which is provided at cretaion of the
+        model builder object.
 
         Parameters:
             - 'clf' a classifier, should be already trained.
             - 'clf_identifier' a unique string containing a identifier for the
                 given model. Should contain all relevant information about the
                 model as it will be part of the filename for the stored model.
-            - 'dir' the relative path of the directory where the model should be
-                stored
+            - 'dataset_identifier' a unique string containing information
+                about the current dataset. Should be informative as it is part
+                of the model file name and we should now from this on what
+                type of data this model was trained.
         Return:
             - a string containing the path to the file where the model is
                 stored.
         """
-        # check if the directory exists, if not create
-        date = datetime.now().strftime("%Y-%m-%d")
-        if not os.path.exists(os.path.join(dir, date)):
-            if self.verbose:
-                logging.debug("model directory does not exists, creating now...")
-            os.makedirs(os.path.join(dir, date))
-
         # build the correct identifier
-        # generate the output file name, format the date after ISO8601
-        timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-        filepath = f'{timestamp}_{clf_identifier}.pkl'
-        output_path = os.path.join(dir, date, filepath)
+        filepath = f'{clf_identifier}_@{dataset_identifier}.pkl'
+        output_path = os.path.join(self.model_dir, filepath)
 
         # write the model to the file
-        with open(output_path, 'wb'):
+        with open(output_path, 'wb') as f:
             if self.verbose:
                 logging.debug(f'storing model at {output_path}')
-            pickle.dump(clf)
-
-        return output_path
+            # store at the correct path
+            pickle.dump(clf, f)
+        logging.debug(f'Successfully stored {clf_identifier} model at \
+{output_path}')
 
     def import_model(self,
                      path: str
@@ -80,10 +114,10 @@ class ModelBuilder:
         file_is_pickle_error = file_util.check_file_is_pickle(path)
         if file_is_pickle_error is not None:
             logging.error(f'file path does not point to a pickle\
-                  file: {file_is_pickle_error}')
+file: {file_is_pickle_error}')
         # if path exists load the model and return
-        with open(path, 'rb'):
-            clf = pickle.load()
+        with open(path, 'rb') as f:
+            clf = pickle.load(f)
 
         return clf
 

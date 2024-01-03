@@ -196,6 +196,7 @@ ipython_config.py
 ## additional stuff that is too large or should not be on github
 data/
 submission/
+models/
 ieee-fraud-detection.zip
 *html
 

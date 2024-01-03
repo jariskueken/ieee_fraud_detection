@@ -76,7 +76,7 @@ CLASSIFIERS = [
     ),
     MLPClassifier(alpha=1, max_iter=1000, random_state=42),
     AdaBoostClassifier(random_state=42),
-    GradientBoostingClassifier(random_state=42),
+    # GradientBoostingClassifier(random_state=42),
     GaussianNB(),
     BernoulliNB(),
     LinearDiscriminantAnalysis(),
