@@ -84,25 +84,25 @@ CLASSIFIERS = [
 ]
 
 CLASSIFIERS_DICT = {
-    "LinReg": LinearRegression(),
-    "LogReg": LogisticRegression(),
-    "Lasso": Lasso(),
-    "SGD": SGDClassifier(random_state=42),
-    "KNC": KNeighborsClassifier(3),
+    # "LinReg": LinearRegression(),
+    # "LogReg": LogisticRegression(),
+    # "Lasso": Lasso(),
+    # "SGD": SGDClassifier(random_state=42),
+    # "KNC": KNeighborsClassifier(3),
     # "LinSVMKern": SVC(kernel="linear", C=0.025, random_state=42),
     # "RBF_SVM": SVC(gamma=2, C=1, random_state=42),
     # "NuSVM": NuSVC(random_state=42),
     # "LinSVM": LinearSVC(random_state=42),
     # "GP": GaussianProcessClassifier(1.0 * RBF(1.0), random_state=42),
-    "DT": DecisionTreeClassifier(max_depth=5, random_state=42),
-    "RF": RandomForestClassifier(
-        max_depth=5, n_estimators=10, max_features=1, random_state=42
-    ),
-    "AdaBoost": AdaBoostClassifier(random_state=42),
+    # "DT": DecisionTreeClassifier(max_depth=5, random_state=42),
+    # "RF": RandomForestClassifier(
+    #     max_depth=5, n_estimators=10, max_features=1, random_state=42
+    # ),
+    # "AdaBoost": AdaBoostClassifier(random_state=42),
     # "GradBoost": GradientBoostingClassifier(random_state=42),
-    "GNB": GaussianNB(),
-    "BNB": BernoulliNB(),
-    "LDA": LinearDiscriminantAnalysis(),
+    # "GNB": GaussianNB(),
+    # "BNB": BernoulliNB(),
+    # "LDA": LinearDiscriminantAnalysis(),
     "QDA": QuadraticDiscriminantAnalysis(),
     "NN": MLPClassifier(alpha=1, max_iter=1000, random_state=42),
 }

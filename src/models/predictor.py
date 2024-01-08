@@ -84,7 +84,7 @@ class Predictor:
         # TODO: check if the submission directory exists
 
         # the actual logic to write to the submission file
-        submission = pd.read_csv(submission_template_path)
+        submission = pd.read_csv(submission_template_path, index_col=None)
 
         # check if the target column and the prediciton are of equal shape
         if submission[target].shape[0] != len(prediction):

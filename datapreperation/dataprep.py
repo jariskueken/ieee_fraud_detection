@@ -58,7 +58,7 @@ class DataPreperator:
         format.
         """
         logging.debug('reading datafiles into dataframes')
-        self.dataframes = [pd.read_csv(path) for path in self.paths]
+        self.dataframes = [pd.read_csv(path, index_col=None) for path in self.paths]
 
     def __merge_data(self) -> None:
         """

@@ -39,7 +39,7 @@ class DataPreprocessor():
         if self.verbose:
             logging.error('check completed, reading data file now...')
 
-        self.data = pd.read_csv(f)
+        self.data = pd.read_csv(f, index_col=None)
 
     def __get_features(self,
                        target: str = '') -> None:

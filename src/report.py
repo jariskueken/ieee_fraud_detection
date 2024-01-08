@@ -53,7 +53,7 @@ aborting... {error}')
 {self.output_path}...')
             os.makedirs(self.output_path)
 
-        data = pd.read_csv(self.path)
+        data = pd.read_csv(self.path, index_col=None)
         self.data = data
         self.name = os.path.basename(self.path)
 
