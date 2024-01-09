@@ -113,7 +113,8 @@ def main(args: argparse.Namespace) -> None:
                         format="%(levelname) -10s %(asctime)s %(module)s:\
 %(lineno)s %(funcName)s %(message)s",
                         level=logging.DEBUG)
-    coloredlogs.install(level='DEBUG')
+    coloredlogs.install(level='DEBUG', fmt="%(levelname) -10s %(asctime)s \
+%(module)s:%(lineno)s %(funcName)s %(message)s")
     preprocessor = DataPreprocessor(args.verbose)
     # TODO: better feature selection method, select good features but only
     # later after we tested all models and found the one we want to work with
@@ -136,6 +137,7 @@ def main(args: argparse.Namespace) -> None:
 
     # HACK: currently use all clfs, needs to be fixed to predict only on
     # subset of clfs
+    test_data = preprocessor.preprocess_data(args.testdata)
     for clf_name in CLASSIFIERS_DICT:
         # bool to define if we are currently testint an ensemble modle to
         # prevent retraining the model in this case
@@ -151,8 +153,6 @@ def main(args: argparse.Namespace) -> None:
 
         # make a prediction for the top 5 clfs
         if args.predict:
-            test_data = preprocessor.preprocess_data(args.testdata)
-
             if data[1] is None:
                 logging.error('failed to predict with empty training target')
                 break

@@ -72,10 +72,12 @@ class Predictor:
         file_path_exists_error = file_util.check_file_path_exists(
             submission_template_path)
         if self.verbose:
-            logging.debug('check if submission file exists and is of type csv file...')
+            logging.debug('check if submission file exists and is of type csv \
+file...')
         # first check if the filepath points to a valid file
         if file_path_exists_error is not None:
-            logging.error(f'received invalid file path: {file_path_exists_error}')
+            logging.error(f'received invalid file path: \
+{file_path_exists_error}')
         # now check if the file is a csv file
         file_is_csv_error = file_util.check_file_is_csv(
             submission_template_path)
@@ -89,8 +91,8 @@ class Predictor:
         # check if the target column and the prediciton are of equal shape
         if submission[target].shape[0] != len(prediction):
             logging.error(f'submission target column has size \
-                  {submission[target].shape[0]} and prediction \
-                    has size {prediction}. Sizes have to be equal')
+{submission[target].shape[0]} and prediction has size {prediction}. Sizes \
+have to be equal')
             return ""
 
         if self.verbose:

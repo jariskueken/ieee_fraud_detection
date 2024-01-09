@@ -41,5 +41,5 @@
     | Gaussian Naive Bayes | 50.85 % | 50.19 % |
     | Bernoulli Naive Bayes | 50.12 % | 50.20 % |
     | Linear Discriminant Analysis | 50.64 % | 50.23 % |
-    | Quadratic Discriminant Analysis | 80.70 % | 82.22 % | 79.66 % | / |
-    | Neural Network | 85.31 % | 86.52 % | 84.51 % | / |
+    | Quadratic Discriminant Analysis | 50.00 % | 50.01 % |
+    | Neural Network | 50.36 % | **50.63 %** |

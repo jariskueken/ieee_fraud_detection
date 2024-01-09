@@ -26,7 +26,7 @@ class DataPreprocessor():
         """
         file_path_exists_error = file_util.check_file_path_exists(f)
         if self.verbose:
-            logging.error('check if file exists and is of type csv file...')
+            logging.debug('check if file exists and is of type csv file...')
         # first check if the filepath points to a valid file
         if file_path_exists_error is not None:
             logging.error(f'received invalid file path: \
@@ -37,7 +37,7 @@ class DataPreprocessor():
             logging.error(f'received non csv path: {file_is_csv_error}')
         # now that we checked everything we can read the data
         if self.verbose:
-            logging.error('check completed, reading data file now...')
+            logging.debug('check completed, reading data file now...')
 
         self.data = pd.read_csv(f, index_col=None)
 
