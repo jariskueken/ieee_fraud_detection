@@ -9,6 +9,7 @@ from sklearn.preprocessing import LabelEncoder
 STRATEGY_MEAN = 'mean'
 STRATEGY_MEDIAN = 'medain'
 STRATEGY_RANDOM = 'random'
+STRATEGY_999 = 'strategy_999'  # fill missing values with -999
 
 
 class DataPreperator:
@@ -21,6 +22,7 @@ class DataPreperator:
                  paths: list[str],
                  match: str,
                  write: bool = False,
+                 replace_strategy: str = STRATEGY_999,
                  output_path: str = '') -> None:
         """
         Intitilizes the class. Takes as input a list of paths to the data
@@ -32,6 +34,8 @@ class DataPreperator:
         self.dataframes: list[pd.DataFrame]
         self.data: pd.DataFrame
         self.output_path = output_path
+        self.replace_strategy = replace_strategy
+
         # read the data into memory
         self.__read_data()
 
@@ -41,9 +45,11 @@ class DataPreperator:
         # TODO: fix so that we dont automatically run all steps on creation
         # strip down the data
         # self.remove_non_numerical_columns()
-        self.encode_cateogircal_features()
         self.remove_empty_columns()
-        self.replace_empty_values()
+
+        self.replace_empty_values(self.replace_strategy)
+
+        self.encode_categorical_features()
 
         # write the data into a new csv file
         if write:
@@ -69,8 +75,8 @@ class DataPreperator:
         self.data = self.dataframes[0]
         for df in self.dataframes[1:]:
             if self.match in df.columns:
-                # use outer as merge type to preserv columns from both dfs
-                self.data = self.data.merge(df, on=self.match, how='outer')
+                # use outer as merge type to perserv columns from both dfs
+                self.data = self.data.merge(df, on=self.match, how='left')
             else:
                 raise ValueError(f'Could not find the match column\
 {self.match}')
@@ -106,7 +112,7 @@ Dropping...')
 , dropping...')
                 del self.data[col]
 
-    def encode_cateogircal_features(self) -> None:
+    def encode_categorical_features(self) -> None:
         """
         encodes every categroical feature in the dataset using the sklearn
         label encoder
@@ -144,8 +150,15 @@ Dropping...')
                 elif strategy == STRATEGY_RANDOM:
                     # TODO: implement
                     raise NotImplementedError
-                logging.debug(f'filling column {col} with {strategy} and value\
- {filler} for {self.data[col].isna().sum()} entries')
+                elif strategy == STRATEGY_999:
+                    # if we have categorical features fill with missing
+                    if self.data[col].dtype == 'object':
+                        filler = 'missing'
+                    else:
+                        filler = -999
+                logging.debug(f'filling column {col} of dtype \
+{self.data[col].dtype} with {strategy} and value {filler} for \
+{self.data[col].isna().sum()} entries')
                 # fill the missing values
                 self.data[col] = self.data[col].fillna(filler)
 
@@ -159,7 +172,7 @@ Dropping...')
             data_type = 'test'
         filepath = f'{data_type}_data_prepared.csv'
         # store the cleaned data into a csv file
-        self.data.to_csv(os.path.join(self.output_path, filepath))
+        self.data.to_csv(os.path.join(self.output_path, filepath), index=False)
 
 
 def parse_args() -> argparse.Namespace:
@@ -205,6 +218,7 @@ def main(args: argparse.Namespace) -> None:
     _ = DataPreperator(args.data,
                        args.match,
                        args.w,
+                       STRATEGY_999,
                        args.output_dir)
 
 
