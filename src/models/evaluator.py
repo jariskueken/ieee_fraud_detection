@@ -88,6 +88,15 @@ stratified k-cross validation')
 
                 # handle classifiers that are not able to predict probabilities
                 y_test_fold_predict = clf.predict_proba(x_test_fold)
+
+                counter = 0
+                for prediction in y_test_fold_predict:
+                    if prediction[1] >= 0.5:
+                        counter += 1
+
+                fraud = [idx for idx in range(len(y_test_fold)) if y_test_fold[idx] == 0]
+                fraud_probas = y_test_fold_predict[fraud]
+                # logging.debug(f'predicted fraud in {(len(y_test_fold_predict)/counter) * 100}% of cases')
                 # use the probabilities for label 1 for roc curve as we use TP
                 # and FP for the curve
                 score = roc_auc_score(y_test_fold, y_test_fold_predict[:, 1])

@@ -108,7 +108,8 @@ have to be equal')
 
         # generate the output file name, format the date aftetr ISO8601
         timestamp = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-        output_file = f'submission_{timestamp}_{clf_identifier}.csv'
+        output_file = f'submission_{timestamp}_{clf_identifier}_\
+{self.dataset_identifier}.csv'
         output_path = os.path.join(submission_dir, date, output_file)
 
         # store the submission file in the correct path

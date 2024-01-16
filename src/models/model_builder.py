@@ -183,7 +183,7 @@ file: {file_is_pickle_error}')
                     # value which is at the same position as we are in the list of
                     # idx
                     idx_to_update = test_idx[i]
-                    current_meta_y[idx_to_update] = y_split[i]
+                    current_meta_y[idx_to_update] = y_split[i][1]
             # add the current meta for each individual model to train_meta_y
             train_meta_y.append(current_meta_y)
             logging.debug(f'finished creating train meta set using k fold cv,\

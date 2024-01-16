@@ -65,8 +65,10 @@ Deleting...')
 
     def preprocess_data(self,
                         f: str,
-                        target: str = ''
-                        ) -> tuple[np.ndarray, np.ndarray] | tuple[np.ndarray, None]:
+                        target: str = '',
+                        scale: bool = True,
+                        ) -> tuple[np.ndarray, np.ndarray] | tuple[np.ndarray,
+                                                                   None]:
         """
         Preprocesses data with every necessary steps
 
@@ -81,6 +83,9 @@ Deleting...')
             - 'target' is a string which contains the name of the target value
                 in the dataset must also match the type of the collumn name
             - 'f' contains the file path to the data file
+            - 'scale' a boolean to determine if we want to standardscale the
+                data or not. Default is true but for some datasets it might
+                be better to not prescale the data.
 
         While preprocessing it does the following steps
         1. Select only the feature collumns that are wanted by the user
@@ -92,8 +97,6 @@ Deleting...')
         self.__read_data(f)
         self.__get_features(target)
 
-        scaler = StandardScaler()
-
         # select only the provided features and also the targets
         targets = None
         # only select targets if parameter is provided
@@ -102,9 +105,15 @@ Deleting...')
             if self.verbose:
                 logging.debug(f'targt vector is of shape {targets.shape}')
 
-        scaled_features = scaler.fit_transform(self.data[self.features])
-        if self.verbose:
+        if scale:
+            #FIXME: can't fit on test data needs scaling factors of training data and then just run transform on test data
+            scaler = StandardScaler()
+            prepared_features = scaler.fit_transform(self.data[self.features])
             logging.debug(f'scaled feature vector is of shape: \
-{scaled_features.shape}.')
-
-        return tuple([scaled_features, targets])  # type: ignore
+{prepared_features.shape}.')
+        else:
+            prepared_features = self.data[self.features].to_numpy()
+            logging.debug(f'prepared feature vector is of shape: \
+{prepared_features.shape}. Did not standardscale the features as scale \
+parameter was False')
+        return tuple([prepared_features, targets])  # type: ignore

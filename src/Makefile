@@ -15,9 +15,9 @@ clean:
 test:
 	python3 -m doctest *.py
 
-testset:
+evaluate:
 	python3 -W"ignore" main.py --traindata ../data/train_data_prepared.csv \
---verbose
+--verbose --evaluate -md ../models
 
 prediction:
 	python3 -W"ignore" main.py --predict --traindata \
@@ -25,8 +25,9 @@ prediction:
 ../data/sample_submission.csv -sd ../submission --verbose -md ../models
 
 ensemble:
-	python3 -W"ignore" main.py --predict --ensemble --traindata \
-../data/train_data_prepared.csv --testdata ../data/test_data_prepared.csv -st ../data/sample_submission.csv -sd ../submission
+	python3 -W"ignore" main.py --ensemble --traindata \
+../data/train_data_prepared.csv --testdata ../data/test_data_prepared.csv -st \
+../data/sample_submission.csv -sd ../submission -md ../models
 
 debug:
 	python3 -W"ignore" main.py --ensemble --traindata \

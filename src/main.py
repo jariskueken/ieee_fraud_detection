@@ -3,6 +3,8 @@ import coloredlogs
 import logging
 import sys
 
+from typing import Any
+
 from dataengineering.data_preprocessing import DataPreprocessor
 from models.evaluator import Evaluator
 from models.predictor import Predictor
@@ -79,12 +81,14 @@ determine scores on all models"
         "-md",
         "--modeltarget",
         type=str,
+        required=True,
         help="The path to the directory where the models should be stored"
     )
     return parser.parse_args()
 
 
 def evaluate(data,
+             clfs: dict[str, Any],
              n: int,
              verbose: bool) -> None:
     # predict on the given estimators
@@ -94,8 +98,8 @@ def evaluate(data,
 
     logging.info('evaluating base models...')
     # evaluate the scores on the list of all classifiers
-    clf_scores = evaluator.evaluate_model(list(CLASSIFIERS_DICT.values()),
-                                          list(CLASSIFIERS_DICT.keys()))
+    clf_scores = evaluator.evaluate_model(list(clfs.values()),
+                                          list(clfs.keys()))
 
     # Return the scores of the top five
     # parse the score into readable output
@@ -120,7 +124,9 @@ def main(args: argparse.Namespace) -> None:
     # later after we tested all models and found the one we want to work with
 
     logging.info('Preprocessing Data...')
-    data = preprocessor.preprocess_data(args.traindata, 'isFraud')
+    data = preprocessor.preprocess_data(args.traindata,
+                                        'isFraud',
+                                        False)
 
     mb = ModelBuilder(
         data[0],
@@ -132,61 +138,62 @@ def main(args: argparse.Namespace) -> None:
     # only evaluate cv scores if we want to
     if args.evaluate:
         evaluate(data,
+                 CLASSIFIERS_DICT,
                  args.n,
                  args.verbose)
 
     # HACK: currently use all clfs, needs to be fixed to predict only on
     # subset of clfs
-    test_data = preprocessor.preprocess_data(args.testdata)
-    for clf_name in CLASSIFIERS_DICT:
-        # bool to define if we are currently testint an ensemble modle to
-        # prevent retraining the model in this case
-        # is_ensemble = False
-        clf = CLASSIFIERS_DICT[clf_name]
-        # just use the clf name as identifier with underscores replacing spaces
-        clf_identifier = str(clf).replace(' ', '_')
+    if args.predict:
+        test_data = preprocessor.preprocess_data(args.testdata,
+                                                 scale=False)
+        for clf_name in CLASSIFIERS_DICT:
+            # bool to define if we are currently testint an ensemble modle to
+            # prevent retraining the model in this case
+            # is_ensemble = False
+            clf = CLASSIFIERS_DICT[clf_name]
+            # just use the clf name as identifier with underscores replacing spaces
+            clf_identifier = str(clf).replace(' ', '_')
 
-        # get the classifier from the model builder
-        clf, pretrained = mb.get_classifier(clf,
-                                            clf_identifier,
-                                            'baseset')
+            # get the classifier from the model builder
+            clf, pretrained = mb.get_classifier(clf,
+                                                clf_identifier,
+                                                'base-999-filler-unscaled')
 
-        # make a prediction for the top 5 clfs
-        if args.predict:
-            if data[1] is None:
-                logging.error('failed to predict with empty training target')
-                break
+            # make a prediction for the top 5 clfs
+            if args.predict:
+                if data[1] is None:
+                    logging.error('failed to predict with empty training target')
+                    break
 
-            predictor = Predictor(data[0],
-                                  data[1],
-                                  test_data[0],
-                                  'baseset',
-                                  mb,
-                                  args.verbose)
+                predictor = Predictor(data[0],
+                                      data[1],
+                                      test_data[0],
+                                      'base-999-filler-unscaled',
+                                      mb,
+                                      args.verbose)
 
-            logging.info(f"predicting on {clf_identifier}")
-            pred_path, prediction = predictor.predict(
-                clf,  # here we need to use the
-                # identifier from the dict
-                clf_identifier,
-                False,
-                True,
-                args.submissiontemplate,
-                args.submissiontarget,
-                'isFraud',
-                pretrained
-            )
+                logging.info(f"predicting on {clf_identifier}")
+                pred_path, prediction = predictor.predict(
+                    clf,  # here we need to use the
+                    # identifier from the dict
+                    clf_identifier,
+                    False,
+                    True,
+                    args.submissiontemplate,
+                    args.submissiontarget,
+                    'isFraud',
+                    pretrained
+                )
 
-    """
     # if we have set ensemble to true we want to create an ensemble of the top n clfs
     if args.ensemble:
         # get all clfs in a lst
-        clfs = {}
-        for score in top_n_clf_scores:
-            clfs[score] = CLASSIFIERS_DICT[score]
+        clfs = CLASSIFIERS_DICT
         logging.info(f'building ensemble of top {args.n} classifiers')
         mb = ModelBuilder(data[0],
                           data[1],
+                          args.modeltarget,
                           args.verbose)
 
         # stacking classifier
@@ -208,35 +215,38 @@ def main(args: argparse.Namespace) -> None:
         eclf_identifier = f'voting_ensemble-\
 {"_".join([name for name in list(clfs.keys())])}'
 
-        ensembles = [sclf, sclf_af, eclf]
-        ensembles_identifiers = [eclf_identifier,
-                                 sclf_identifier,
-                                 sclf_af_identifier]
+        ensembles = {eclf_identifier: eclf,
+                     sclf_identifier: sclf,
+                     sclf_af_identifier: sclf_af}
+
         # evaluate the ensemble models
-        scores = evaluator.evaluate_model(ensembles,
-                                          ensembles_identifiers)
-        for score in scores:
-            logging.info(f'median score of {score} classifier is \
-                {round(scores[score][0], 3) * 100}%')
+        evaluate(data,
+                 ensembles,
+                 args.n,
+                 True)
 
-        if args.predict:
-            test_data = preprocessor.preprocess_data(args.testdata)
-            predictor = Predictor(data[0], data[1], test_data[0], args.verbose)
+        # make a predicition always
+        test_data = preprocessor.preprocess_data(args.testdata,
+                                                 scale=False)
+        predictor = Predictor(data[0],
+                              data[1],
+                              test_data[0],
+                              'base-999-filler-unscaled',
+                              args.verbose)
 
-            for eclf, eclf_identifier in zip(ensembles, ensembles_identifiers):
-                logging.info(f"predicting on {eclf_identifier}")
-                pred_path, prediction = predictor.predict(
-                    eclf,  # here we need to use the
-                    # identifier from the dict
-                    eclf_identifier,
-                    False,
-                    True,
-                    args.submissiontemplate,
-                    args.submissiontarget,
-                    'isFraud',
-                    False,
-                )
-    """
+        for eclf_identifier in ensembles:
+            logging.info(f"predicting on {eclf_identifier}")
+            pred_path, prediction = predictor.predict(
+                eclf,  # here we need to use the
+                # identifier from the dict
+                ensembles[eclf_identifier],
+                False,
+                True,
+                args.submissiontemplate,
+                args.submissiontarget,
+                'isFraud',
+                False,
+            )
 
 
 if __name__ == "__main__":

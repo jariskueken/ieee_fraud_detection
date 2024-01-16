@@ -69,7 +69,7 @@ CLASSIFIERS = [
     # SVC(gamma=2, C=1, random_state=42),
     # NuSVC(random_state=42),
     # LinearSVC(random_state=42),
-    GaussianProcessClassifier(1.0 * RBF(1.0), random_state=42),
+    # GaussianProcessClassifier(1.0 * RBF(1.0), random_state=42),
     DecisionTreeClassifier(max_depth=5, random_state=42),
     RandomForestClassifier(
         max_depth=5, n_estimators=10, max_features=1, random_state=42
@@ -95,16 +95,16 @@ CLASSIFIERS_DICT = {
     # "LinSVM": LinearSVC(random_state=42),
     # "GP": GaussianProcessClassifier(1.0 * RBF(1.0), random_state=42),
     # "DT": DecisionTreeClassifier(max_depth=5, random_state=42),
-    # "RF": RandomForestClassifier(
-    #     max_depth=5, n_estimators=10, max_features=1, random_state=42
-    # ),
-    # "AdaBoost": AdaBoostClassifier(random_state=42),
+    "RF": RandomForestClassifier(
+        max_depth=5, n_estimators=10, max_features=1, random_state=42
+    ),
+    "AdaBoost": AdaBoostClassifier(random_state=42),
     # "GradBoost": GradientBoostingClassifier(random_state=42),
     # "GNB": GaussianNB(),
-    # "BNB": BernoulliNB(),
+    "BNB": BernoulliNB(),
     # "LDA": LinearDiscriminantAnalysis(),
-    "QDA": QuadraticDiscriminantAnalysis(),
-    "NN": MLPClassifier(alpha=1, max_iter=1000, random_state=42),
+    # "QDA": QuadraticDiscriminantAnalysis(),
+    # "NN": MLPClassifier(alpha=1, max_iter=1000, random_state=42),
 }
 
 CLFS_SHORT_DICT = {
