@@ -3,6 +3,8 @@ import coloredlogs
 import logging
 import sys
 
+import numpy as np
+
 from typing import Any
 
 from dataengineering.data_preprocessing import DataPreprocessor
@@ -32,6 +34,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--testdata",
         type=str,
+        default="",
         help="path to the csv-files that contain the test data for the model"
     )
     parser.add_argument(
@@ -78,6 +81,11 @@ def parse_args() -> argparse.Namespace:
 determine scores on all models"
     )
     parser.add_argument(
+        "--dataset-description",
+        type=str,
+        help="description of the dataset currently in use"
+    )
+    parser.add_argument(
         "-md",
         "--modeltarget",
         type=str,
@@ -87,13 +95,14 @@ determine scores on all models"
     return parser.parse_args()
 
 
-def evaluate(data,
+def evaluate(data_X: np.ndarray,
+             data_y: np.ndarray,
              clfs: dict[str, Any],
              n: int,
              verbose: bool) -> None:
     # predict on the given estimators
-    evaluator = Evaluator(data[0],
-                          data[1],
+    evaluator = Evaluator(data_X,
+                          data_y,
                           verbose)
 
     logging.info('evaluating base models...')
@@ -119,25 +128,29 @@ def main(args: argparse.Namespace) -> None:
                         level=logging.DEBUG)
     coloredlogs.install(level='DEBUG', fmt="%(levelname) -10s %(asctime)s \
 %(module)s:%(lineno)s %(funcName)s %(message)s")
-    preprocessor = DataPreprocessor(args.verbose)
+    preprocessor = DataPreprocessor(args.traindata,
+                                    args.testdata,
+                                    'isFraud',
+                                    args.predict,
+                                    args.verbose)
     # TODO: better feature selection method, select good features but only
     # later after we tested all models and found the one we want to work with
 
     logging.info('Preprocessing Data...')
-    data = preprocessor.preprocess_data(args.traindata,
-                                        'isFraud',
-                                        False)
+    # preprocess the data
+    preprocessor.preprocess_data()
 
     mb = ModelBuilder(
-        data[0],
-        data[1],
+        preprocessor.train_data_X,
+        preprocessor.train_data_y,
         args.modeltarget,
         args.verbose
     )
 
     # only evaluate cv scores if we want to
     if args.evaluate:
-        evaluate(data,
+        evaluate(preprocessor.train_data_X,
+                 preprocessor.train_data_y,
                  CLASSIFIERS_DICT,
                  args.n,
                  args.verbose)
@@ -145,31 +158,31 @@ def main(args: argparse.Namespace) -> None:
     # HACK: currently use all clfs, needs to be fixed to predict only on
     # subset of clfs
     if args.predict:
-        test_data = preprocessor.preprocess_data(args.testdata,
-                                                 scale=False)
         for clf_name in CLASSIFIERS_DICT:
             # bool to define if we are currently testint an ensemble modle to
             # prevent retraining the model in this case
             # is_ensemble = False
             clf = CLASSIFIERS_DICT[clf_name]
-            # just use the clf name as identifier with underscores replacing spaces
+            # just use the clf name as identifier with underscores replacing
+            # spaces
             clf_identifier = str(clf).replace(' ', '_')
 
             # get the classifier from the model builder
             clf, pretrained = mb.get_classifier(clf,
                                                 clf_identifier,
-                                                'base-999-filler-unscaled')
+                                                args.dataset_description)
 
             # make a prediction for the top 5 clfs
             if args.predict:
-                if data[1] is None:
-                    logging.error('failed to predict with empty training target')
+                if preprocessor.train_data_y is None:
+                    logging.error('failed to predict with empty training \
+target')
                     break
 
-                predictor = Predictor(data[0],
-                                      data[1],
-                                      test_data[0],
-                                      'base-999-filler-unscaled',
+                predictor = Predictor(preprocessor.train_data_X,
+                                      preprocessor.train_data_y,
+                                      preprocessor.test_data_X,
+                                      args.dataset_description,
                                       mb,
                                       args.verbose)
 
@@ -191,8 +204,8 @@ def main(args: argparse.Namespace) -> None:
         # get all clfs in a lst
         clfs = CLASSIFIERS_DICT
         logging.info(f'building ensemble of top {args.n} classifiers')
-        mb = ModelBuilder(data[0],
-                          data[1],
+        mb = ModelBuilder(preprocessor.train_data_X,
+                          preprocessor.train_data_y,
                           args.modeltarget,
                           args.verbose)
 
@@ -220,18 +233,16 @@ def main(args: argparse.Namespace) -> None:
                      sclf_af_identifier: sclf_af}
 
         # evaluate the ensemble models
-        evaluate(data,
+        evaluate(preprocessor.train_data_X,
+                 preprocessor.train_data_y,
                  ensembles,
                  args.n,
                  True)
 
-        # make a predicition always
-        test_data = preprocessor.preprocess_data(args.testdata,
-                                                 scale=False)
-        predictor = Predictor(data[0],
-                              data[1],
-                              test_data[0],
-                              'base-999-filler-unscaled',
+        predictor = Predictor(preprocessor.train_data_X,
+                              preprocessor.train_data_y,
+                              preprocessor.test_data_X,
+                              args.dataset_description,
                               args.verbose)
 
         for eclf_identifier in ensembles:

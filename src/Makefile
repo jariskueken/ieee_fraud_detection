@@ -16,13 +16,13 @@ test:
 	python3 -m doctest *.py
 
 evaluate:
-	python3 -W"ignore" main.py --traindata ../data/train_data_prepared.csv \
---verbose --evaluate -md ../models
+	python3 -W"ignore" main.py --traindata ../data/train_data_downscaled.csv \
+--verbose --evaluate -md ../models --dataset-description base-999-filler-scaledown
 
 prediction:
 	python3 -W"ignore" main.py --predict --traindata \
-../data/train_data_prepared.csv --testdata ../data/test_data_prepared.csv -st \
-../data/sample_submission.csv -sd ../submission --verbose -md ../models
+../data/train_data_downscaled.csv --testdata ../data/test_data_downscaled.csv -st \
+../data/sample_submission.csv -sd ../submission --verbose -md ../models --dataset-description base-999-filler-scaledown
 
 ensemble:
 	python3 -W"ignore" main.py --ensemble --traindata \

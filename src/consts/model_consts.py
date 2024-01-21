@@ -101,10 +101,10 @@ CLASSIFIERS_DICT = {
     "AdaBoost": AdaBoostClassifier(random_state=42),
     # "GradBoost": GradientBoostingClassifier(random_state=42),
     # "GNB": GaussianNB(),
-    "BNB": BernoulliNB(),
+    # "BNB": BernoulliNB(),
     # "LDA": LinearDiscriminantAnalysis(),
     # "QDA": QuadraticDiscriminantAnalysis(),
-    # "NN": MLPClassifier(alpha=1, max_iter=1000, random_state=42),
+    "NN": MLPClassifier(alpha=1, max_iter=1000, random_state=42),
 }
 
 CLFS_SHORT_DICT = {

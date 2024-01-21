@@ -8,6 +8,9 @@ from util import file_util
 
 from sklearn.preprocessing import StandardScaler
 
+TYPE_TRAIN = 'train'
+TYPE_TEST = 'test'
+
 
 class DataPreprocessor():
     """
@@ -15,12 +18,29 @@ class DataPreprocessor():
     starts by checking if the provided data file exists and then reads the
     data. Preprocessed the data after the given steps.
     """
-    def __init__(self, verbose: bool):
+    def __init__(self,
+                 train_data_path: str,
+                 test_data_path: str,
+                 target: str = '',
+                 predict: bool = False,
+                 verbose: bool = False):
+
         self.verbose = verbose
-        self.data = pd.DataFrame()
+        self.target = target
         self.features: list[str] = []
 
-    def __read_data(self, f: str) -> None:
+        # the prepared data
+        self.train_data_X: np.ndarray
+        self.train_data_y: np.ndarray
+        self.test_data_X: np.ndarray
+
+        # build the data, build always for train data and only for test data
+        # if we want to predict
+        self.__build_from_file(train_data_path, TYPE_TRAIN)
+        if predict:
+            self.__build_from_file(test_data_path, TYPE_TEST)
+
+    def __read_data(self, f: str) -> pd.DataFrame:
         """
         A private method to read the data from the csv file
         """
@@ -39,36 +59,61 @@ class DataPreprocessor():
         if self.verbose:
             logging.debug('check completed, reading data file now...')
 
-        self.data = pd.read_csv(f, index_col=None)
+        return pd.read_csv(f, index_col=None)
 
     def __get_features(self,
-                       target: str = '') -> None:
+                       data: pd.DataFrame
+                       ) -> None:
         """
         A private method that gets a target feature and selects all features
         from the provided dataset from there on. Writes the features list into
         'self.features'.
         """
 
-        features = self.data.columns.values.tolist()
+        features = data.columns.values.tolist()
         # store the features as str names
         features = [str(feature) for feature in features]
 
         # drop the target from the list of features as we don't want to train
         # with the target
-        if target != '':
-            if target in features:
-                logging.debug(f'found target {target} in list of features. \
-Deleting...')
-                features.remove(target)
+        if self.target != '':
+            if self.target in features:
+                logging.debug(f'found target {self.target} in list of \
+features. Deleting...')
+                features.remove(self.target)
 
         self.features = features
 
-    def preprocess_data(self,
-                        f: str,
-                        target: str = '',
-                        scale: bool = True,
-                        ) -> tuple[np.ndarray, np.ndarray] | tuple[np.ndarray,
-                                                                   None]:
+    def __build_from_file(self,
+                          path: str,
+                          type: str) -> None:
+        """
+        builds the dataframes for the datasets provided as paths on creation
+        of this object
+        """
+
+        # start by reading the data
+        logging.debug(f'reading data from {path}')
+        data = self.__read_data(path)
+
+        # extract the features if they don't already exist
+        if not self.features:
+            logging.debug('features are empty getting now..')
+            self.__get_features(data)
+
+        # build the dataframes
+        if type == TYPE_TRAIN:
+            logging.debug('building X and Y vectors for training data')
+            self.train_data_X = data[self.features].to_numpy()
+            self.train_data_y = data[self.target].to_numpy()
+
+        elif type == TYPE_TEST:
+            logging.debug('building X vector for test data')
+            self.test_data_X = data[self.features].to_numpy()
+
+        del data
+
+    def preprocess_data(self) -> None:
         """
         Preprocesses data with every necessary steps
 
@@ -94,26 +139,12 @@ Deleting...')
         4. Return the data as Dataframe again
         """
 
-        self.__read_data(f)
-        self.__get_features(target)
-
-        # select only the provided features and also the targets
-        targets = None
-        # only select targets if parameter is provided
-        if target != '':
-            targets = self.data[target].to_numpy()
-            if self.verbose:
-                logging.debug(f'targt vector is of shape {targets.shape}')
-
-        if scale:
-            #FIXME: can't fit on test data needs scaling factors of training data and then just run transform on test data
-            scaler = StandardScaler()
-            prepared_features = scaler.fit_transform(self.data[self.features])
-            logging.debug(f'scaled feature vector is of shape: \
-{prepared_features.shape}.')
-        else:
-            prepared_features = self.data[self.features].to_numpy()
-            logging.debug(f'prepared feature vector is of shape: \
-{prepared_features.shape}. Did not standardscale the features as scale \
-parameter was False')
-        return tuple([prepared_features, targets])  # type: ignore
+        # FIXME: can't fit on test data needs scaling factors of training
+        # data and then just run transform on test data
+        scaler = StandardScaler()
+        logging.debug(f'scaling train data of shape: \n Rows: \
+{self.train_data_X.shape[0]} \n Collumns: {self.train_data_X.shape[1]}')
+        self.train_data_X = scaler.fit_transform(self.train_data_X)
+        logging.debug(f'scaling test data of shape: \n Rows: \
+{self.test_data_X.shape[0]} \n Collumns: {self.test_data_X.shape[1]}')
+        self.test_data_X = scaler.transform(self.test_data_X)
