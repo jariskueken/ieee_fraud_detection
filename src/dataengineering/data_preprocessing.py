@@ -39,6 +39,10 @@ class DataPreprocessor():
         self.__build_from_file(train_data_path, TYPE_TRAIN)
         if predict:
             self.__build_from_file(test_data_path, TYPE_TEST)
+        else:
+            # if we have no test data just initalize it as empty array of zero
+            # rows and zero cols
+            self.test_data_X = np.empty((0, 0))
 
     def __read_data(self, f: str) -> pd.DataFrame:
         """
@@ -147,4 +151,7 @@ features. Deleting...')
         self.train_data_X = scaler.fit_transform(self.train_data_X)
         logging.debug(f'scaling test data of shape: \n Rows: \
 {self.test_data_X.shape[0]} \n Collumns: {self.test_data_X.shape[1]}')
-        self.test_data_X = scaler.transform(self.test_data_X)
+
+        # only transform test data if not empty
+        if self.test_data_X.shape[0] > 0 and self.test_data_X.shape[0] > 0:
+            self.test_data_X = scaler.transform(self.test_data_X)
