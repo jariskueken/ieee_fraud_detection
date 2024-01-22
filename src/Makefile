@@ -15,9 +15,17 @@ clean:
 test:
 	python3 -m doctest *.py
 
-evaluate:
+evaluate-base:
+	python3 -W"ignore" main.py --traindata ../data/train_data_prepared.csv \
+--verbose --evaluate -md ../models --dataset-description base-999-filler
+
+evaluate-scaledown:
 	python3 -W"ignore" main.py --traindata ../data/train_data_downscaled.csv \
 --verbose --evaluate -md ../models --dataset-description base-999-filler-scaledown
+
+evaluate-openfe:
+	python3 -W"ignore" main.py --traindata ../data/train_data_openfe.csv \
+--verbose --evaluate -md ../models --dataset-description openfe-features
 
 prediction:
 	python3 -W"ignore" main.py --predict --traindata \

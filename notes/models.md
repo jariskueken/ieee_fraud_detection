@@ -8,7 +8,7 @@
         - **blocked cv**
 - the **scores** are calculated as **roc_auc scores** where the **predictions** are calculated using **predict_proba**
 - this was also run on a simpler dataset neglecting every non numerical column and filling empty values with -999
-- **SCORES:**
+- **SCORES (SKF)(Base):**
     | Classifier  | Average Score  | Highest Score  | Lowest Score  | Annotation |
     |---|---|---|---| --- |
     | Linear Regression  | 0.0 %  | 0.0 %  | 0.0% | Has no predict_proba |
@@ -28,8 +28,15 @@
     | Quadratic Discriminant Analysis | 81.39 % | 82.69 % | 79.91 % | / |
     | Neural Network | 81.39 % | 82.69 % | 79.91 % | / |
 
-- most models **overfit**, should be result of the imbalanced dataset we have
-
+- **SCORES(TSS)(Base):**
+    | Classifier  | Average Score  | Highest Score  | Lowest Score  | Annotation |
+    |---|---|---|---| --- |
+    | Random Forrest(2000estimators, max_depth12) | 85.15  %  |  86.79 %  | 84.15 % | / |
+    | AdaBoost  | 85.83 %  | 87.80 %  | 84.48 %  | / |
+    | Neural Network  | 80.25 %  | 84.15 %  | 74.36 %  | / |
+    | XGBoost  | 92.44 %  | 94.02 % | 89.37 % | / |
+    | CatBoost  | 85.83 %  | 87.80 %  | 84.48 %  | / |
+    | LGBM  | 80.25 %  | 84.15 %  | 74.36 %  | / |
 - **Kaggle scores** when training on the entire joined dataset where we **replaced missing values with collumn mean** and **dropped columns with more than 90 % missing values** and **encoding categorical features**:
 - **NOTE:** logisitic regression and k-neighbors are not re-evaluated
     | Classifier  | Private Score  | Public Score |

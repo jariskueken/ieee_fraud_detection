@@ -14,6 +14,10 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC, NuSVC, LinearSVC
 from sklearn.tree import DecisionTreeClassifier
 
+from xgboost import XGBClassifier
+from catboost import CatBoostClassifier
+from lightgbm import LGBMClassifier
+
 # list of classifiers to test
 CLASSIFIER_NAMES = [
     "Linear Regression",
@@ -96,15 +100,32 @@ CLASSIFIERS_DICT = {
     # "GP": GaussianProcessClassifier(1.0 * RBF(1.0), random_state=42),
     # "DT": DecisionTreeClassifier(max_depth=5, random_state=42),
     "RF": RandomForestClassifier(
-        max_depth=5, n_estimators=10, max_features=1, random_state=42
+        max_depth=12, n_estimators=2000, max_features=1, random_state=42
     ),
-    "AdaBoost": AdaBoostClassifier(random_state=42),
+    # "AdaBoost": AdaBoostClassifier(random_state=42),
     # "GradBoost": GradientBoostingClassifier(random_state=42),
     # "GNB": GaussianNB(),
     # "BNB": BernoulliNB(),
     # "LDA": LinearDiscriminantAnalysis(),
     # "QDA": QuadraticDiscriminantAnalysis(),
-    "NN": MLPClassifier(alpha=1, max_iter=1000, random_state=42),
+    # "NN": MLPClassifier(alpha=1, max_iter=1000, random_state=42),
+    # "xgb": XGBClassifier(n_estimators=2000,
+    #                      max_depth=12,
+    #                      learning_rate=0.02,
+    #                      subsample=0.8,
+    #                      colsample_bytree=0.4,
+    #                      eval_metric='auc'),
+    "cat": CatBoostClassifier(n_estimators=2000,
+                              max_depth=12,
+                              learning_rate=0.02,
+                              subsample=0.8,
+                              eval_metric='AUC'),
+    "lgbm": LGBMClassifier(n_estimators=2000,
+                           max_depth=12,
+                           learning_rate=0.02,
+                           subsample=0.8,
+                           colsample_bytree=0.4,
+                           metric="auc")
 }
 
 CLFS_SHORT_DICT = {
