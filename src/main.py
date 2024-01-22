@@ -8,7 +8,7 @@ import numpy as np
 from typing import Any
 
 from dataengineering.data_preprocessing import DataPreprocessor
-from models.evaluator import Evaluator
+from models.evaluator import Evaluator, SKF, TSS
 from models.predictor import Predictor
 from models.model_builder import ModelBuilder
 
@@ -108,7 +108,8 @@ def evaluate(data_X: np.ndarray,
     logging.info('evaluating base models...')
     # evaluate the scores on the list of all classifiers
     clf_scores = evaluator.evaluate_model(list(clfs.values()),
-                                          list(clfs.keys()))
+                                          list(clfs.keys()),
+                                          TSS)
 
     # Return the scores of the top five
     # parse the score into readable output

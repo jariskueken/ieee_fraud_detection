@@ -6,10 +6,11 @@ from statistics import mean
 import numpy as np
 from util.decorators import timeit
 
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, TimeSeriesSplit
 from sklearn.metrics import roc_auc_score
 
-
+SKF = 'Stratified-K-Fold'
+TSS = 'Time-Series-Split'
 class Evaluator():
     """
     A class that evaluates prediction models on a given data set
@@ -35,11 +36,12 @@ class Evaluator():
                              clf: Any,
                              x: np.ndarray,
                              y: np.ndarray,
+                             split_type: str = SKF,
                              splits: int = 10,
                              random_state: int = 1,
                              ) -> list[float]:
         """
-        This method runs stratified k-fold cross validation on the provided
+        This method runs cross validation on the provided
         data and trains the given model on the data using the split datasets.
         Parameters:
             - 'clf' is the classifier we want to test. This is of any type but
@@ -61,17 +63,24 @@ class Evaluator():
 
         # split the training set into k splits. We shuffle every time, and
         # random_state is optional depending on our use case
-        skf = StratifiedKFold(n_splits=splits,
-                              shuffle=True,
-                              random_state=random_state)
-        skf.get_n_splits(x, y)
+        if split_type == SKF:
+            logging.debug('running skf as split type')
+            cv = StratifiedKFold(n_splits=splits,
+                                 shuffle=True,
+                                 random_state=random_state)
+
+        elif split_type == TSS:
+            logging.debug('running tss as split type')
+            cv = TimeSeriesSplit(n_splits=splits)
+
+        cv.get_n_splits(x, y)
         scores = []
         if self.verbose:
             logging.debug(f'evaluating model {clf} on {splits} splits using \
-stratified k-cross validation')
+{split_type} cross validation')
 
         # iterate over every split
-        for i, (train_idx, test_idx) in enumerate(skf.split(x, y)):
+        for i, (train_idx, test_idx) in enumerate(cv.split(x, y)):
             logging.debug(f'running {i}th split for {clf}')
 
             # handle with try except to prevent entire testing process to fail
@@ -94,9 +103,6 @@ stratified k-cross validation')
                     if prediction[1] >= 0.5:
                         counter += 1
 
-                fraud = [idx for idx in range(len(y_test_fold)) if y_test_fold[idx] == 0]
-                fraud_probas = y_test_fold_predict[fraud]
-                # logging.debug(f'predicted fraud in {(len(y_test_fold_predict)/counter) * 100}% of cases')
                 # use the probabilities for label 1 for roc curve as we use TP
                 # and FP for the curve
                 score = roc_auc_score(y_test_fold, y_test_fold_predict[:, 1])
@@ -111,8 +117,8 @@ stratified k-cross validation')
     @timeit
     def evaluate_model(self,
                        clfs: list[Any],
-
-                       clf_names: list[str]
+                       clf_names: list[str],
+                       cv_type: str = SKF,
                        ) -> dict[str, tuple[float, list[float]]]:
         """
         Evaluates the model given as paramters using stratified
@@ -128,6 +134,8 @@ stratified k-cross validation')
             - 'clf_name' a list of strings with the corresponding human
                 readable names of each classifier to better map the score
                 to a classifier
+            - 'cv_type' the type of splitting mechanism we want to use for our
+                dataset
 
         Return:
             - a hashmap of type -> dict: (clf_name: (avg_score, [scores])
@@ -156,7 +164,8 @@ target data')
                 logging.debug(f'currently evaluating {classifier_name}')
             clf_scores = self.cross_validate_model(clf,
                                                    self.x,
-                                                   self.y)
+                                                   self.y,
+                                                   cv_type)
             # print the scores if verbose
             if self.verbose:
                 logging.debug(f'Mean overall score for {classifier_name} \
