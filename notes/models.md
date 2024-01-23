@@ -35,8 +35,9 @@
     | AdaBoost  | 85.83 %  | 87.80 %  | 84.48 %  | / |
     | Neural Network  | 80.25 %  | 84.15 %  | 74.36 %  | / |
     | XGBoost  | 92.44 %  | 94.02 % | 89.37 % | / |
-    | CatBoost  | 85.83 %  | 87.80 %  | 84.48 %  | / |
-    | LGBM  | 80.25 %  | 84.15 %  | 74.36 %  | / |
+    | CatBoost  | 91.81 %  | 93.66 %  | 88.02 %  | / |
+    | LGBM  | 91.60 %  | 93.68 %  | 89.21 %  | / |
+
 - **Kaggle scores** when training on the entire joined dataset where we **replaced missing values with collumn mean** and **dropped columns with more than 90 % missing values** and **encoding categorical features**:
 - **NOTE:** logisitic regression and k-neighbors are not re-evaluated
     | Classifier  | Private Score  | Public Score |
