@@ -99,9 +99,9 @@ CLASSIFIERS_DICT = {
     # "LinSVM": LinearSVC(random_state=42),
     # "GP": GaussianProcessClassifier(1.0 * RBF(1.0), random_state=42),
     # "DT": DecisionTreeClassifier(max_depth=5, random_state=42),
-    "RF": RandomForestClassifier(
-        max_depth=12, n_estimators=2000, max_features=1, random_state=42
-    ),
+    # "RF": RandomForestClassifier(
+    #     max_depth=12, n_estimators=2000, max_features=1, random_state=42
+    # ),
     # "AdaBoost": AdaBoostClassifier(random_state=42),
     # "GradBoost": GradientBoostingClassifier(random_state=42),
     # "GNB": GaussianNB(),

@@ -11,6 +11,8 @@ from sklearn.metrics import roc_auc_score
 
 SKF = 'Stratified-K-Fold'
 TSS = 'Time-Series-Split'
+
+
 class Evaluator():
     """
     A class that evaluates prediction models on a given data set

@@ -11,6 +11,7 @@ from dataengineering.data_preprocessing import DataPreprocessor
 from models.evaluator import Evaluator, SKF, TSS
 from models.predictor import Predictor
 from models.model_builder import ModelBuilder
+from models.optimizer import Optimizer
 
 from consts.model_consts import CLFS_SHORT_DICT, CLASSIFIERS_DICT
 
@@ -92,6 +93,12 @@ determine scores on all models"
         required=True,
         help="The path to the directory where the models should be stored"
     )
+    parser.add_argument(
+        "-hpo",
+        action="store_true",
+        help="Boolean flag to define if we should run hyperparamter \
+    optimization"
+    )
     return parser.parse_args()
 
 
@@ -121,6 +128,23 @@ def evaluate(data_X: np.ndarray,
                 {round(top_n_clf_scores[score][0], 3) * 100}%')
 
 
+def optimize(data_X: np.ndarray,
+             data_y: np.ndarray,
+             dataset_description: str,
+             clf_identifier: str,
+             n_trials: int,
+             verbose: bool):
+
+    opt = Optimizer(data_X,
+                    data_y,
+                    dataset_description,
+                    verbose)
+
+    # runs hpo and loggs the result
+    opt.run_hpo(clf_identifier,
+                n_trials=n_trials)
+
+
 # TODO: wrap main method better
 def main(args: argparse.Namespace) -> None:
     logging.basicConfig(stream=sys.stdout,
@@ -147,6 +171,15 @@ def main(args: argparse.Namespace) -> None:
         args.modeltarget,
         args.verbose
     )
+
+    # run hpo
+    if args.hpo:
+        optimize(preprocessor.train_data_X,
+                 preprocessor.train_data_y,
+                 args.dataset_description,
+                 "RF",
+                 100,
+                 args.verbose)
 
     # only evaluate cv scores if we want to
     if args.evaluate:

@@ -27,6 +27,14 @@ evaluate-openfe:
 	python3 -W"ignore" main.py --traindata ../data/train_data_openfe.csv \
 --verbose --evaluate -md ../models --dataset-description openfe-features
 
+evaluate-pca:
+	python3 -W"ignore" main.py --traindata ../data/train_data_pca.csv \
+--verbose --evaluate -md ../models --dataset-description pca_2_comp
+
+hpo:
+	python3 -W"ignore" main.py --traindata ../data/train_data_pca.csv \
+--verbose -hpo -md ../models --dataset-description pca_2_comp
+
 prediction:
 	python3 -W"ignore" main.py --predict --traindata \
 ../data/train_data_downscaled.csv --testdata ../data/test_data_downscaled.csv -st \
