@@ -116,7 +116,8 @@ def evaluate(data_X: np.ndarray,
     # evaluate the scores on the list of all classifiers
     clf_scores = evaluator.evaluate_model(list(clfs.values()),
                                           list(clfs.keys()),
-                                          TSS)
+                                          TSS,
+                                          10)
 
     # Return the scores of the top five
     # parse the score into readable output
@@ -142,7 +143,9 @@ def optimize(data_X: np.ndarray,
 
     # runs hpo and loggs the result
     opt.run_hpo(clf_identifier,
-                n_trials=n_trials)
+                n_trials,
+                3  # num cv splits
+                )
 
 
 # TODO: wrap main method better

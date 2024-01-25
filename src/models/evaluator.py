@@ -6,7 +6,7 @@ from statistics import mean
 import numpy as np
 from util.decorators import timeit
 
-from sklearn.model_selection import StratifiedKFold, TimeSeriesSplit
+from sklearn.model_selection import StratifiedKFold, TimeSeriesSplit, train_test_split
 from sklearn.metrics import roc_auc_score
 
 SKF = 'Stratified-K-Fold'
@@ -100,11 +100,6 @@ class Evaluator():
                 # handle classifiers that are not able to predict probabilities
                 y_test_fold_predict = clf.predict_proba(x_test_fold)
 
-                counter = 0
-                for prediction in y_test_fold_predict:
-                    if prediction[1] >= 0.5:
-                        counter += 1
-
                 # use the probabilities for label 1 for roc curve as we use TP
                 # and FP for the curve
                 score = roc_auc_score(y_test_fold, y_test_fold_predict[:, 1])
@@ -121,6 +116,7 @@ class Evaluator():
                        clfs: list[Any],
                        clf_names: list[str],
                        cv_type: str = SKF,
+                       cv_splits: int = 10,
                        ) -> dict[str, tuple[float, list[float]]]:
         """
         Evaluates the model given as paramters using stratified
@@ -167,7 +163,8 @@ target data')
             clf_scores = self.cross_validate_model(clf,
                                                    self.x,
                                                    self.y,
-                                                   cv_type)
+                                                   cv_type,
+                                                   cv_splits)
             # print the scores if verbose
             if self.verbose:
                 logging.debug(f'Mean overall score for {classifier_name} \
@@ -181,6 +178,47 @@ was: {min(clf_scores)*100} %')
             mean_score = mean(clf_scores)
             scores[classifier_name] = tuple([mean_score, clf_scores])
         return scores
+
+    @timeit
+    def hold_out_evaluate(self,
+                          clf: Any,
+                          clf_identifier: str,
+                          test_size: float = 0.4
+                          ) -> float:
+        """
+        A method to run hold oout valdation on the given training set.
+        Performs a train/test split as provided by the test_size parameter and
+        then runs the model afterwards on this split. Returns the score as
+        float
+        """
+        train_X, test_X, train_y, test_y = \
+            train_test_split(self.x,
+                             self.y,
+                             test_size=test_size,
+                             random_state=1)
+        try:
+            logging.debug(f'currently fitting {clf} on train split of \
+size {1- test_size} of the original training data')
+            # fit the model on the train data split
+            clf.fit(train_X, train_y)
+
+            logging.debug(f'predicting on {clf_identifier} classifiert')
+            # predict probas
+            prediction = clf.predict_proba(test_X)
+
+            # calc scores
+            score = roc_auc_score(test_y, prediction[:, 1])
+
+            # print the scores if verbose
+            if self.verbose:
+                logging.debug(f'Score for {clf} classifier was: {score*100} %')
+
+        except Exception as e:
+            logging.debug(f'got an error for {clf_identifier} breaking...: \
+{e}')
+            score = 0.0
+
+        return score
 
     def get_top_n_clfs(self,
                        clfs: dict[str, tuple[float, list[float]]],
