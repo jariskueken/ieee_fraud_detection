@@ -11,7 +11,7 @@ from dataengineering.data_preprocessing import DataPreprocessor
 from model.evaluator import Evaluator, SKF, TSS
 from model.predictor import Predictor
 from model.model_builder import ModelBuilder
-from github.ieee_fraud_detection.src.model.optimizer import Optimizer
+from model.optimizer import Optimizer
 
 from consts.model_consts import CLFS_SHORT_DICT, CLASSIFIERS_DICT
 
@@ -201,9 +201,10 @@ def main(args: argparse.Namespace) -> None:
             # is_ensemble = False
             clf = CLASSIFIERS_DICT[clf_name]
             # just use the clf name as identifier with underscores replacing
-            # spaces
-            clf_identifier = str(clf).replace(' ', '_')
-
+            # spaces, cut after 100 charcters max to prevent to long filenames
+            # HACK: just use the short name for the clf as identifier
+            # clf_identifier = str(clf).replace(' ', '_')[:100]
+            clf_identifier = clf_name
             # get the classifier from the model builder
             clf, pretrained = mb.get_classifier(clf,
                                                 clf_identifier,

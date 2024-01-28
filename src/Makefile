@@ -37,8 +37,8 @@ hpo:
 
 prediction:
 	python3 -W"ignore" main.py --predict --traindata \
-../data/train_data_downscaled.csv --testdata ../data/test_data_downscaled.csv -st \
-../data/sample_submission.csv -sd ../submission --verbose -md ../models --dataset-description base-999-filler-scaledown
+../data/train_data_prepared.csv --testdata ../data/test_data_prepared.csv -st \
+../data/sample_submission.csv -sd ../submission --verbose -md ../models --dataset-description base-999-filler
 
 ensemble:
 	python3 -W"ignore" main.py --ensemble --traindata \
