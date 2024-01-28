@@ -232,3 +232,6 @@ Temporary Items
 ### macOS Patch ###
 # iCloud generated files
 *.icloud
+
+# ML Libraries
+catboost_info/

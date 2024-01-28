@@ -8,7 +8,7 @@ from util import file_util
 import numpy as np
 import pandas as pd
 
-from models.model_builder import ModelBuilder
+from model.model_builder import ModelBuilder
 
 
 class Predictor:

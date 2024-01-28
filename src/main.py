@@ -8,10 +8,10 @@ import numpy as np
 from typing import Any
 
 from dataengineering.data_preprocessing import DataPreprocessor
-from models.evaluator import Evaluator, SKF, TSS
-from models.predictor import Predictor
-from models.model_builder import ModelBuilder
-from models.optimizer import Optimizer
+from model.evaluator import Evaluator, SKF, TSS
+from model.predictor import Predictor
+from model.model_builder import ModelBuilder
+from github.ieee_fraud_detection.src.model.optimizer import Optimizer
 
 from consts.model_consts import CLFS_SHORT_DICT, CLASSIFIERS_DICT
 
