@@ -43,7 +43,7 @@ prediction:
 ensemble:
 	python3 -W"ignore" main.py --ensemble --traindata \
 ../data/train_data_prepared.csv --testdata ../data/test_data_prepared.csv -st \
-../data/sample_submission.csv -sd ../submission -md ../models
+../data/sample_submission.csv -sd ../submission -md ../models --dataset-description base-999-filler
 
 debug:
 	python3 -W"ignore" main.py --ensemble --traindata \

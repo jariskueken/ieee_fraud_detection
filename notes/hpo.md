@@ -12,3 +12,16 @@
     | md = 11, mf = 2, ne = 560, rs=325 | 73.94  %  |  -  | - | / |
     | md = 15, mf = 6, ne = 831, rs=1000 | 75.22  %  |  -  | - | / |
     | md = 14, mf = 4, ne = 1558, rs=47 | 74.94  %  |  -  | - | / |
+    | md = 12, mf = 1, ne = 2000, rs=42 | 74.87  %  |  -  | - | (Base) |
+
+- running hpo on xgb yielded:
+
+    | Classifier  | Average Score  | Highest Score  | Lowest Score  | Annotation |
+    |---|---|---|---| --- |
+    | md = 12, lr = 0.02, subsample = 0.8, colsample_bytree = 0.4, ne = 2000, rs=42 | 70.80  %  |  -  | - | (Base) |
+
+- running hpo on lgbm yielded:
+
+    | Classifier  | Average Score  | Highest Score  | Lowest Score  | Annotation |
+    |---|---|---|---| --- |
+    | md = 12, lr = 0.02, subsample = 0.8, colsample_bytree = 0.4, ne = 2000, rs=42 | 71.24  %  |  -  | - | (Base) |

@@ -109,6 +109,12 @@ CLASSIFIERS_DICT = {
     # "LDA": LinearDiscriminantAnalysis(),
     # "QDA": QuadraticDiscriminantAnalysis(),
     # "NN": MLPClassifier(alpha=1, max_iter=1000, random_state=42),
+    "RF": RandomForestClassifier(
+        max_depth=18,
+        n_estimators=816,
+        max_features=3,
+        random_state=331
+    ),
     "xgb": XGBClassifier(n_estimators=2000,
                          max_depth=12,
                          learning_rate=0.02,
@@ -119,7 +125,8 @@ CLASSIFIERS_DICT = {
                               max_depth=12,
                               learning_rate=0.02,
                               subsample=0.8,
-                              eval_metric='AUC'),
+                              eval_metric='AUC',
+                              verbose=False),
     "lgbm": LGBMClassifier(n_estimators=2000,
                            max_depth=12,
                            learning_rate=0.02,

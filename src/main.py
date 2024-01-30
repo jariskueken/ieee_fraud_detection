@@ -102,31 +102,45 @@ determine scores on all models"
     return parser.parse_args()
 
 
+CV = 'cross-validation'
+HV = 'holdout-validation'
+
 def evaluate(data_X: np.ndarray,
              data_y: np.ndarray,
              clfs: dict[str, Any],
              n: int,
+             validation_type: str,
              verbose: bool) -> None:
+
     # predict on the given estimators
     evaluator = Evaluator(data_X,
                           data_y,
                           verbose)
 
     logging.info('evaluating base models...')
-    # evaluate the scores on the list of all classifiers
-    clf_scores = evaluator.evaluate_model(list(clfs.values()),
-                                          list(clfs.keys()),
-                                          TSS,
-                                          10)
 
-    # Return the scores of the top five
-    # parse the score into readable output
-    top_n_clf_scores = evaluator.get_top_n_clfs(clf_scores,
-                                                n)
+    # run cross validation if type is set
+    if validation_type == CV:
+        # evaluate the scores on the list of all classifiers
+        clf_scores = evaluator.evaluate_model(list(clfs.values()),
+                                            list(clfs.keys()),
+                                            TSS,
+                                            10)
 
-    for score in top_n_clf_scores:
-        logging.info(f'Average score of {score}-classifier is \
-                {round(top_n_clf_scores[score][0], 3) * 100}%')
+        # Return the scores of the top five
+        # parse the score into readable output
+        top_n_clf_scores = evaluator.get_top_n_clfs(clf_scores,
+                                                    n)
+
+        for score in top_n_clf_scores:
+            logging.info(f'Average score of {score}-classifier is \
+                    {round(top_n_clf_scores[score][0], 3) * 100}%')
+    elif validation_type == HV:
+        for clf_name in clfs:
+            score = evaluator.hold_out_evaluate(clfs[clf_name], clf_name)
+            logging.info(f'score for {clf_name} classifier was {score * 100}% \
+when running the following specs {clfs[clf_name]} on a 40% of the training \
+set as test set')
 
 
 def optimize(data_X: np.ndarray,
@@ -186,10 +200,12 @@ def main(args: argparse.Namespace) -> None:
 
     # only evaluate cv scores if we want to
     if args.evaluate:
+        # NOTE: currently running holdout validation as validation type
         evaluate(preprocessor.train_data_X,
                  preprocessor.train_data_y,
                  CLASSIFIERS_DICT,
                  args.n,
+                 HV,
                  args.verbose)
 
     # HACK: currently use all clfs, needs to be fixed to predict only on
@@ -246,7 +262,8 @@ target')
                           preprocessor.train_data_y,
                           args.modeltarget,
                           args.verbose)
-
+        # TODO: neglect stacking for now because of runtime
+        """
         # stacking classifier
         sclf = mb.build_stacking_ensemble(list(clfs.values()),
                                           list(clfs.keys()))
@@ -259,36 +276,40 @@ target')
                                              True)
         sclf_af_identifier = f'stackin_ensemble_af-\
 {"_".join([name for name in list(clfs.keys())])}'
-
+        """
         # voting classifier
         eclf = mb.build_voting_ensemble(list(clfs.values()),
                                         list(clfs.keys()))
         eclf_identifier = f'voting_ensemble-\
 {"_".join([name for name in list(clfs.keys())])}'
 
-        ensembles = {eclf_identifier: eclf,
-                     sclf_identifier: sclf,
-                     sclf_af_identifier: sclf_af}
-
+        ensembles = {eclf_identifier: eclf}
+                    # TODO: uncomment
+                    # sclf_identifier: sclf,
+                    # sclf_af_identifier: sclf_af}
+        """
         # evaluate the ensemble models
         evaluate(preprocessor.train_data_X,
                  preprocessor.train_data_y,
                  ensembles,
                  args.n,
+                 HV,
                  True)
+        """
 
         predictor = Predictor(preprocessor.train_data_X,
                               preprocessor.train_data_y,
                               preprocessor.test_data_X,
                               args.dataset_description,
+                              mb,
                               args.verbose)
 
         for eclf_identifier in ensembles:
             logging.info(f"predicting on {eclf_identifier}")
             pred_path, prediction = predictor.predict(
-                eclf,  # here we need to use the
+                ensembles[eclf_identifier],  # here we need to use the
                 # identifier from the dict
-                ensembles[eclf_identifier],
+                eclf_identifier,
                 False,
                 True,
                 args.submissiontemplate,

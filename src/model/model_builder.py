@@ -239,6 +239,8 @@ classifier')
 
         eclf = VotingClassifier(
             estimators=estimators,
-            voting='hard')
+            voting='soft')  # use soft if we want to use predict_proba,
+        # otherwise returns an error because predict_proba not existant for
+        # voting=hard
 
         return eclf

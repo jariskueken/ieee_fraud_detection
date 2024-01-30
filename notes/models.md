@@ -38,6 +38,11 @@
     | CatBoost  | 91.81 %  | 93.66 %  | 88.02 %  | / |
     | LGBM  | 91.60 %  | 93.68 %  | 89.21 %  | / |
 
+- **SCORES(Holdout)(Base)**
+    | Classifier | Score |
+    | --- | --- |
+    | VotingEnsemble(XGB, CatBoost, LGBM, RF(md18, ne816, mf3, rs331)) | 95.38 % |
+
 - **Kaggle scores** when training on the entire joined dataset where we **replaced missing values with collumn mean** and **dropped columns with more than 90 % missing values** and **encoding categorical features**:
 - **NOTE:** logisitic regression and k-neighbors are not re-evaluated
     | Classifier  | Private Score  | Public Score |
