@@ -42,6 +42,13 @@
     | Classifier | Score |
     | --- | --- |
     | VotingEnsemble(XGB, CatBoost, LGBM, RF(md18, ne816, mf3, rs331)) | 95.38 % |
+- **SCORES(HV)(Base):**
+    | Classifier  | Average Score |
+    |---|---|
+    | Random Forrest(2000estimators, max_depth12, max_features1, random_state42) | 85.09  %  |
+    | Random Forrest(831estimators, max_depth15, max_features6, random_state1000) | 88.23  %  |
+    | Random Forrest(1558estimators, max_depth14, max_features2, random_state47) | 87.51  %  |
+    | Random Forrest(507estimators, max_depth12, max_features2, random_state873) | 85.96  %  |
 
 - **Kaggle scores** when training on the entire joined dataset where we **replaced missing values with collumn mean** and **dropped columns with more than 90 % missing values** and **encoding categorical features**:
 - **NOTE:** logisitic regression and k-neighbors are not re-evaluated

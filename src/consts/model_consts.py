@@ -87,7 +87,7 @@ CLASSIFIERS = [
     QuadraticDiscriminantAnalysis(),
 ]
 
-CLASSIFIERS_DICT = {
+CLASSIFIERS_DICT_ALL = {
     # "LinReg": LinearRegression(),
     # "LogReg": LogisticRegression(),
     # "Lasso": Lasso(),
@@ -109,6 +109,56 @@ CLASSIFIERS_DICT = {
     # "LDA": LinearDiscriminantAnalysis(),
     # "QDA": QuadraticDiscriminantAnalysis(),
     # "NN": MLPClassifier(alpha=1, max_iter=1000, random_state=42),
+    # "xgb": XGBClassifier(n_estimators=2000,
+    #                      max_depth=12,
+    #                      learning_rate=0.02,
+    #                      subsample=0.8,
+    #                      colsample_bytree=0.4,
+    #                      eval_metric='auc'),
+    # "cat": CatBoostClassifier(n_estimators=2000,
+    #                           max_depth=12,
+    #                           learning_rate=0.02,
+    #                           subsample=0.8,
+    #                           eval_metric='AUC'),
+    # "lgbm": LGBMClassifier(n_estimators=2000,
+    #                        max_depth=12,
+    #                        learning_rate=0.02,
+    #                        subsample=0.8,
+    #                        colsample_bytree=0.4,
+    #                        metric="auc")
+}
+
+CLASSIFIERS_DICT = {
+    "RF_Base": RandomForestClassifier(
+        max_depth=12, n_estimators=2000, max_features=1, random_state=42
+    ),
+    "RF_1": RandomForestClassifier(
+        max_depth=15, n_estimators=831, max_features=6, random_state=1000
+    ),
+    "RF_2": RandomForestClassifier(
+        max_depth=14, n_estimators=1558, max_features=4, random_state=47
+    ),
+    "RF_3": RandomForestClassifier(
+        max_depth=12, n_estimators=507, max_features=2, random_state=873
+    ),
+    # "AdaBoost": AdaBoostClassifier(random_state=42),
+    # "xgb": XGBClassifier(n_estimators=2000,
+    #                      max_depth=12,
+    #                      learning_rate=0.02,
+    #                      subsample=0.8,
+    #                      colsample_bytree=0.4,
+    #                      eval_metric='auc'),
+    # "cat": CatBoostClassifier(n_estimators=2000,
+    #                           max_depth=12,
+    #                           learning_rate=0.02,
+    #                           subsample=0.8,
+    #                           eval_metric='AUC'),
+    # "lgbm": LGBMClassifier(n_estimators=2000,
+    #                        max_depth=12,
+    #                        learning_rate=0.02,
+    #                        subsample=0.8,
+    #                        colsample_bytree=0.4,
+    #                        metric="auc")
     "RF": RandomForestClassifier(
         max_depth=18,
         n_estimators=816,

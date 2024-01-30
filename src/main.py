@@ -197,7 +197,7 @@ def main(args: argparse.Namespace) -> None:
                  "RF",
                  100,
                  args.verbose)
-
+    
     # only evaluate cv scores if we want to
     if args.evaluate:
         # NOTE: currently running holdout validation as validation type
