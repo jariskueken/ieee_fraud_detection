@@ -225,21 +225,4 @@ classifier...')
 
         return tuple([prediction, submission_file])
 
-    def predict_pretrained_model(self,
-                                 clf_path: str,
-                                 clf_identifier: str,
-                                 store_prediction: bool = False,
-                                 submission_template_path: str = None,
-                                 submission_dir: str = None,
-                                 target: str = None
-                                 ) -> tuple[np.ndarray, str]:
-        """
-        A method to make a prediction on a given dataset. Uses a pretrained
-        model to make a prediction. Takes a path to the model, loads the model
-        and makes a prediction using the loaded model
-
-        Paramters:
-            - 'clf_path' the path to the stored classifier
-        """
-
 

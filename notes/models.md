@@ -46,6 +46,7 @@
     | Classifier  | Average Score |
     |---|---|
     | Random Forrest(2000estimators, max_depth12, max_features1, random_state42) | 85.09  %  |
+    | Random Forrest(816estimators, max_depth18, max_features3, random_state331) | 88.62  %  |
     | Random Forrest(831estimators, max_depth15, max_features6, random_state1000) | 88.23  %  |
     | Random Forrest(1558estimators, max_depth14, max_features2, random_state47) | 87.51  %  |
     | Random Forrest(507estimators, max_depth12, max_features2, random_state873) | 85.96  %  |
