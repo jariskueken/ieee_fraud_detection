@@ -200,6 +200,7 @@ submission/
 models/
 ieee-fraud-detection.zip
 *html
+AutogluonModels/
 
 ### macOS ###
 # General
