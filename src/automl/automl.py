@@ -84,7 +84,6 @@ def main(args: argparse.Namespace) -> None:
     # predict proba
     y_pred = predictor.predict_proba(test_data)  # returns a dataframe of cols 0, 1
     del test_data
-    pd.DataFrame(y_pred).to_csv('submission.csv')
     submission = pd.read_csv(args.submissiontemplate, index_col=None)
     # overwrite the target in the predicitions
     submission['isFraud'] = y_pred[1]  # just write the true prediction column to the submission
