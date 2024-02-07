@@ -129,12 +129,12 @@ CLASSIFIERS_DICT_ALL = {
 }
 
 CLASSIFIERS_DICT = {
-    "RF_Base": RandomForestClassifier(
-        max_depth=12, n_estimators=2000, max_features=1, random_state=42
-    ),
-    "RF_1": RandomForestClassifier(
-        max_depth=15, n_estimators=831, max_features=6, random_state=1000
-    ),
+    # "RF_Base": RandomForestClassifier(
+    #     max_depth=12, n_estimators=2000, max_features=1, random_state=42
+    # ),
+    # "RF_1": RandomForestClassifier(
+    #     max_depth=15, n_estimators=831, max_features=6, random_state=1000
+    # ),
     # "RF_2": RandomForestClassifier(
     #     max_depth=14, n_estimators=1558, max_features=4, random_state=47
     # ),
@@ -144,7 +144,7 @@ CLASSIFIERS_DICT = {
     "RF_4": RandomForestClassifier(
         max_depth=18, n_estimators=816, max_features=3, random_state=331
     ),
-    "AdaBoost": AdaBoostClassifier(random_state=42),
+    # "AdaBoost": AdaBoostClassifier(random_state=42),
     # "RF": RandomForestClassifier(
     #     max_depth=18,
     #     n_estimators=816,
@@ -157,12 +157,12 @@ CLASSIFIERS_DICT = {
                          subsample=0.8,
                          colsample_bytree=0.4,
                          eval_metric='auc'),
-    # "cat": CatBoostClassifier(n_estimators=2000,
-    #                           max_depth=12,
-    #                           learning_rate=0.02,
-    #                           subsample=0.8,
-    #                           eval_metric='AUC',
-    #                           verbose=False),
+    "cat": CatBoostClassifier(n_estimators=2000,
+                              max_depth=12,
+                              learning_rate=0.02,
+                              subsample=0.8,
+                              eval_metric='AUC',
+                              verbose=False),
     "lgbm": LGBMClassifier(n_estimators=2000,
                            max_depth=12,
                            learning_rate=0.02,

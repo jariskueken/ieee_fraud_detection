@@ -68,7 +68,8 @@ def main(args: argparse.Namespace) -> None:
     # fit
     predictor = TabularPredictor(label='isFraud',
                                  problem_type='binary',
-                                 eval_metric='roc_auc'
+                                 eval_metric='roc_auc',
+                                 verbosity=4
                                  ).fit(train,
                                        validation,
                                        use_bag_holdout=True,

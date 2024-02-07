@@ -16,5 +16,5 @@ test:
 	python3 -m doctest *.py
 
 run:
-	python3 automl.py --traindata ../../data/train_data_prepared.csv --testdata ../../data/test_data_prepared.csv \
-	-st ../../data/sample_submission.csv -sd ../../submission --datasetidentifier base-999-filler --timelimit 1200.0
+	python3 automl.py --traindata ../../data/train_data_prepared_raw.csv --testdata ../../data/test_data_prepared_raw.csv \
+	-st ../../data/sample_submission.csv -sd ../../submission --datasetidentifier base-raw --timelimit 1200.0

@@ -210,7 +210,8 @@ def main(args: argparse.Namespace) -> None:
 
     # HACK: currently use all clfs, needs to be fixed to predict only on
     # subset of clfs
-    if args.predict:
+    # only run this prediction logic if we don't have an ensemble otherwise run the ensemble logic
+    if args.predict and not args.ensemble:
         for clf_name in CLASSIFIERS_DICT:
             # bool to define if we are currently testint an ensemble modle to
             # prevent retraining the model in this case
