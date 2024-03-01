@@ -68,6 +68,7 @@
 
 - moving forward using **Random Forrest, AdaBoost and Neural Network and Bernoulli NB** as they returned the most promissing results
 
+- WRONGLY SCALED DATA!
 - patterns in the data aren't necessarily what we want to find but rather finding **anomalies**, CV scores of the three used clfs for **unscaled** data
 
     | Classifier  | Average Score  | Highest Score  | Lowest Score  | Annotation |

@@ -141,34 +141,38 @@ CLASSIFIERS_DICT = {
     # "RF_3": RandomForestClassifier(
     #     max_depth=12, n_estimators=507, max_features=2, random_state=873
     # ),
-    "RF_4": RandomForestClassifier(
-        max_depth=18, n_estimators=816, max_features=3, random_state=331
+    # "RF_4": RandomForestClassifier(
+    #     max_depth=18, n_estimators=816, max_features=3, random_state=331
+    # ),
+    "RF": RandomForestClassifier(
+        max_depth=5, n_estimators=10, max_features=1, random_state=42
     ),
     # "AdaBoost": AdaBoostClassifier(random_state=42),
+    # "NN": MLPClassifier(alpha=1, max_iter=1000, random_state=42),
     # "RF": RandomForestClassifier(
     #     max_depth=18,
     #     n_estimators=816,
     #     max_features=3,
     #     random_state=331
     # ),
-    "xgb": XGBClassifier(n_estimators=2000,
-                         max_depth=12,
-                         learning_rate=0.02,
-                         subsample=0.8,
-                         colsample_bytree=0.4,
-                         eval_metric='auc'),
-    "cat": CatBoostClassifier(n_estimators=2000,
-                              max_depth=12,
-                              learning_rate=0.02,
-                              subsample=0.8,
-                              eval_metric='AUC',
-                              verbose=False),
-    "lgbm": LGBMClassifier(n_estimators=2000,
-                           max_depth=12,
-                           learning_rate=0.02,
-                           subsample=0.8,
-                           colsample_bytree=0.4,
-                           metric="auc")
+    # "xgb": XGBClassifier(n_estimators=2000,
+    #                      max_depth=12,
+    #                      learning_rate=0.02,
+    #                      subsample=0.8,
+    #                      colsample_bytree=0.4,
+    #                      eval_metric='auc'),
+    # "cat": CatBoostClassifier(n_estimators=2000,
+    #                           max_depth=12,
+    #                           learning_rate=0.02,
+    #                           subsample=0.8,
+    #                           eval_metric='AUC',
+    #                           verbose=False),
+    # "lgbm": LGBMClassifier(n_estimators=2000,
+    #                        max_depth=12,
+    #                        learning_rate=0.02,
+    #                        subsample=0.8,
+    #                        colsample_bytree=0.4,
+    #                        metric="auc")
 }
 
 CLFS_SHORT_DICT = {
